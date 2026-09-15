@@ -2,13 +2,13 @@
 
 Preflight robot deployments before simulation and commissioning.
 
-Robot Preflight turns robot requirements, facility evidence, and deployment
-context into grounded constraints that can be checked before downstream
-engineering begins.
+Robot Preflight is an extensible deployment-constraint verification framework.
+It binds sourced robot requirements to facility evidence and runs deterministic
+checks before downstream engineering begins.
 
-Today, one verifier is fully evidenced end to end:
+Today one verifier is independently evidenced end to end:
 
-**OTTO 1500 selected-span aisle clearance (Verifier #1).**
+**Verifier #1 — OTTO 1500 selected-span aisle clearance.**
 
 ![Robot Preflight Hero Loop](media/hero/robot_preflight_hero.webp)
 
@@ -44,27 +44,33 @@ multiple stages: mission definition, facility representation, robot definition,
 feasibility and simulation, detailed deployment design, site preparation, OEM
 fleet configuration, and commissioning.
 
-Robot Preflight conceptually sits **between initial definition (Stages 1–3) and
-downstream simulation/commissioning (Stages 4+)**:
+Robot Preflight structures one part of the reconciliation work that currently happens
+before simulation and commissioning. It sits **between initial definition (Stages 1–3)
+and downstream simulation/commissioning (Stages 4+)**:
 
 ```
-Stage 1: Mission Definition
-Stage 2: Facility Representation
-Stage 3: Robot & Envelope Definition
+Stage 1: Mission Definition (what the operation needs)
+Stage 2: Facility Representation (what the facility contains)
+Stage 3: Robot & Envelope Definition (what the robot can do)
                  │
                  ▼
       [ ROBOT PREFLIGHT ]
-      • Sourced requirement extraction
-      • Spatial entity grounding (manual today)
-      • Deterministic verifiers (Verifier #1: aisle clearance)
-      • PASS / BLOCKED / REVIEW decision
+      • Sourced robot requirements (curated)
+      • Facility evidence (GLB today)
+      • Manual entity selection (today)
+      • Verifier Registry (Verifier #1: aisle clearance)
+      • PASS / BLOCKED / REVIEW decision model
                  │
                  ▼
       Verified Constraints
                  │
-                 ▼ (can feed / future handoff)
+                 ▼ (future handoff)
 Existing downstream tools: Simulation · OEM Fleet Manager · Planners · Commissioning
 ```
+
+Robot Preflight turns sourced robot requirements and facility evidence into
+inspectable deployment constraint checks before simulation and commissioning.
+Task-aware grounding and multi-constraint preflight are next.
 
 Robot Preflight does **not** replace physics simulation, fleet managers (e.g.
 OTTO Fleet Manager, MiR Fleet), navigation planners (Nav2), or physical
@@ -76,17 +82,41 @@ See [`docs/workflow-context.md`](docs/workflow-context.md) for the complete
 
 ---
 
+## Facility evidence is an input, not a file format
+
+Robot Preflight currently consumes structured GLB geometry.
+
+Real AMR deployments may start from CAD, maps, scans, robot-generated maps, or other facility representations.
+
+[`spatial-ai`](https://github.com/SaiTejaMutchi/spatial-ai) is a separate SignalWeave project for turning RGB-D / LiDAR observations into persistent physical entities, metric geometry, and provenance-linked measurements.
+
+The two repositories cover different parts of the same deployment workflow:
+
+* `spatial-ai` → facility state (what physically exists)
+* `robot-preflight` → deployment constraint verification (does this robot requirement agree with that facility evidence?)
+* **SignalWeave** → system tying these pieces into the existing deployment workflow
+
+There is no automatic integration between the two repositories today.
+
+---
+
 ## The Core Value: Why This Exists
 
 A geometry library can calculate the distance between two 3D meshes.
 **Robot Preflight preserves why that distance matters:**
 
-* **Which robot requirement it came from** — with citations to hashed manufacturer PDFs.
-* **Which deployment configuration it applies to** — nominal model, attachments, and operating mode.
-* **Which facility entities were measured** — exact node IDs from the facility spatial model.
-* **How they were measured** — axis, bounding hulls, and declared tolerances.
-* **Explicit decision status** — whether the requirement clearly passes, blocks, or requires review.
-* **Inspectable audit trail** — deterministic reproduction independent of UI rendering.
+It ties together:
+
+* **Sourced robot requirement** — cited from hashed manufacturer specifications.
+* **Exact facility entities** — designated node IDs from the facility spatial model.
+* **Deterministic measurement method** — axis, combined renderer bounds, and declared tolerances.
+* **Tolerance** — explicit measurement margin and uncertainty threshold.
+* **Signed margin** — exact numeric difference between available and required dimensions.
+* **Decision** — deterministic evaluation (`PASS`, `BLOCKED`, or `REVIEW`).
+* **Evidence and provenance** — hashes, run timestamps, and audit artifacts.
+
+This is the current added value. Grounding is manual today; automated task-aware
+constraint grounding is roadmap.
 
 ---
 
@@ -138,7 +168,7 @@ measurement:
 
 ---
 
-## Decision Vocabulary
+## Decision Model
 
 Robot Preflight implements a three-state deterministic decision model:
 
@@ -148,15 +178,58 @@ Robot Preflight implements a three-state deterministic decision model:
 
 Both Python and C# engines implement identical decision arithmetic, verified in unit tests.
 
+> [!NOTE]
+> **Implementation vs. Reference Evidence**:  
+> * **Decision model implemented**: `PASS` / `BLOCKED` / `REVIEW` (arithmetic fully implemented and covered by unit tests).  
+> * **Independently evidenced reference result**: `PASS` (Verifier #1: OTTO 1500 in AWS RoboMaker warehouse, cross-validated between Unity and Python to within 1 µm).
+
 ---
 
 ## Architecture
 
 ![Robot Preflight Architecture](media/architecture/robot_preflight_architecture.svg)
 
-Robot Preflight sits between robot requirements and facility geometry.
-Physical measurements come from explicit geometry. Compatibility decisions remain
-deterministic and inspectable:
+The architecture is structured across current capabilities, adjacent open-source projects, and future roadmap:
+
+### CURRENT
+```
+Sourced robot requirement (curated) + Facility GLB + Manual entity selection
+                                      │
+                                      ▼
+                        [ ROBOT PREFLIGHT ]
+                         Verifier Registry
+                                      │
+                                      ▼
+                           PASS / BLOCKED / REVIEW
+                                      │
+                                      ▼
+                           Structured JSON evidence
+```
+
+### ADJACENT SIGNALWEAVE OSS
+```
+RGB-D / LiDAR observations
+          │
+          ▼
+    [ spatial-ai ]
+          │
+          ▼
+Structured facility state (what physically exists)
+```
+
+### NEXT
+```
+Robot + Facility + Task
+          │
+          ▼
+   Automatic grounding
+          │
+          ▼
+Multi-constraint preflight
+          │
+          ▼
+Simulation / Planners / OEM handoff
+```
 
 * **Verifier Registry** (`robot_preflight.verifiers`): An extensible registry mapping constraint types to dedicated verification implementations.
 * **Verifier #1** (`AisleClearanceVerifier`): The initial active verifier, executing nearest-face world-space bounds queries on glTF node trees.

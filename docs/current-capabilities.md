@@ -5,12 +5,18 @@ repository based on code inspection across Python, Unity, schemas, and evidence 
 
 ## Product Maturity Level
 
-**Current Level: LEVEL 1 (transitioning to LEVEL 2)**
+**Architecture maturity: LEVEL 2**  
+**Evidence breadth: LEVEL 1**
 
-* **Level 1 (Current)**: A deterministic aisle-clearance verifier for a configured robot requirement and manually selected facility entities.
-* **Level 2 (Target / Architecture)**: An extensible deployment-constraint verification framework with one fully evidenced verifier (aisle clearance) and pluggable verifier interfaces.
-* **Level 3 (Roadmap)**: A deployment preflight engine that ingests robot, facility, and task context, performing automated grounding to site geometry.
-* **Level 4 (Future Vision)**: A deployment compiler that emits validated configurations for planners, simulators, and OEM fleet managers.
+* **Architecture Maturity — LEVEL 2**: An extensible deployment-constraint verification framework. The verifier registry (`robot_preflight.verifiers`), abstract verifier interface (`BaseVerifier`), structured result contract (`PreflightResult`), and constraint dispatch mechanism exist in code today.
+* **Evidence Breadth — LEVEL 1**: Only one verifier has full end-to-end external reference evidence: selected-span aisle clearance (Verifier #1: OTTO 1500 in AWS RoboMaker warehouse, cross-validated with Unity within 1 µm).
+* **Roadmap — LEVEL 3**: Task-aware grounding and multi-constraint preflight (ingesting mission semantics and performing automated entity grounding to facility geometry).
+* **Future Vision — LEVEL 4**: Downstream deployment compilation (emitting validated configurations for planners, simulators, and OEM fleet managers).
+
+> [!IMPORTANT]
+> **Why Level 2 Architecture**: Verifier registry, base interface, structured result contract, and constraint type dispatch exist in active code.  
+> **Why Level 1 Evidence Breadth**: Only aisle clearance has an externally validated reference example with frozen physical evidence and dual-engine cross-validation.  
+> Do not describe the system as Level 3 (no automated task/mission grounding exists). Do not claim automatic deployment qualification.
 
 ---
 
@@ -33,9 +39,8 @@ repository based on code inspection across Python, Unity, schemas, and evidence 
 | | Polymorphic constraint engine | **PARTIAL** | Single constraint type (`aisle_clearance`) currently active | Disclose as initial constraint type |
 | **G. Verifier Registry** | Pluggable verifier interface | **IMPLEMENTED** | `robot_preflight/verifiers/` modular verifier pattern | Yes — extensible verifier architecture |
 | | Active verified implementations | **VERIFIED (1)** | Verifier #1: Selected-span aisle clearance | Exactly one verifier verified end-to-end |
-| **H. Decision Model** | PASS decision logic | **VERIFIED** | Tested in pytest and verified against frozen evidence | Yes — fully verified |
-| | BLOCKED decision logic | **IMPLEMENTED** | Implemented in Python and C# (`difference < 0`); tested | Yes — arithmetic implemented and verified |
-| | REVIEW decision logic | **IMPLEMENTED** | Implemented in Python and C# (`abs(difference) <= tolerance`); tested | Yes — arithmetic implemented and verified |
+| **H. Decision Model** | Decision model implemented | **IMPLEMENTED** | `robot_preflight/core.py`, `AisleClearanceVerifier`: PASS / BLOCKED / REVIEW arithmetic | Yes — arithmetic implemented and verified for all 3 states |
+| | Independently evidenced reference result | **VERIFIED (1)** | `evidence/results/otto1500_warehouse.json`: PASS reference result | Yes — reference PASS result independently validated |
 | **I. Evidence Model** | Complete provenance trail | **VERIFIED** | `PreflightResult.to_dict()`, `evidence/results/otto1500_warehouse.json` | Yes — stores hashes, nodes, bounds, methods, sources |
 | **J. Downstream Output** | Machine-readable JSON artifact | **VERIFIED** | `robot-preflight check --json`, `PreflightResult.to_dict()` | Yes — structured JSON output |
 | | Planner / Nav2 / Open-RMF / OEM writeback | **NOT IMPLEMENTED** | No exporter for Nav2, ROS, Open-RMF, or OEM tools | No — downstream integration is roadmap |

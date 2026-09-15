@@ -26,17 +26,20 @@ manufacturing facility is an iterative, multi-stage engineering process:
 
 ## Where Robot Preflight Fits
 
+Robot Preflight structures one part of the reconciliation work that currently happens before simulation and commissioning.
+
 ```
-Stage 1: Mission Definition
-Stage 2: Facility Representation
-Stage 3: Robot & Envelope Definition
+Stage 1: Mission Definition (what the operation needs)
+Stage 2: Facility Representation (what the facility contains)
+Stage 3: Robot & Envelope Definition (what the robot can do)
                  │
                  ▼
       [ ROBOT PREFLIGHT ]
-      • Sourced requirement extraction
-      • Spatial entity grounding
-      • Deterministic geometry checks
-      • PASS / BLOCKED / REVIEW decision
+      • Sourced robot requirements (curated)
+      • Facility evidence (GLB today)
+      • Manual entity selection (today)
+      • Verifier Registry (Verifier #1: aisle clearance)
+      • PASS / BLOCKED / REVIEW decision model
                  │
                  ▼
 Stage 4: Feasibility & Simulation
@@ -47,9 +50,9 @@ Stage 5+: Detailed Design, OEM Configuration, Commissioning
 
 Robot Preflight conceptually sits **between Stages 1–3 and Stage 4**.
 
-Its role is to turn documented robot requirements and facility geometry into
-grounded, deterministic constraints *before* committing engineering time to
-physics simulation, detailed network design, or on-site commissioning.
+Robot Preflight turns sourced robot requirements and facility evidence into
+inspectable deployment constraint checks before simulation and commissioning.
+Task-aware grounding and multi-constraint preflight are next.
 
 ### What Robot Preflight Does Not Replace
 
@@ -60,6 +63,29 @@ Robot Preflight does **not** replace:
 * **Safety Certification**: It does not certify compliance with ISO 3691-4 or ANSI/RIA R15.08.
 
 Its job is to make physical assumptions explicit and catch spatial conflicts early.
+
+---
+
+## Facility Evidence and the SignalWeave Ecosystem
+
+Robot Preflight currently consumes structured GLB geometry. Real AMR deployments may start from CAD, maps, scans, robot-generated maps, or other facility representations.
+
+SignalWeave is building technical pieces inside the existing AMR deployment workflow:
+
+* [`spatial-ai`](https://github.com/SaiTejaMutchi/spatial-ai) structures physical facility state from mobile RGB-D and LiDAR observations into persistent physical entities (`wall-001`, `floor-001`), metric geometry, and provenance-linked measurements.
+* [`robot-preflight`](https://github.com/SaiTejaMutchi/robot-preflight) verifies robot deployment constraints against facility state before simulation and commissioning.
+
+```
+       [ SPATIAL-AI ]                    [ ROBOT-PREFLIGHT ]
+RGB-D / LiDAR observations        Sourced robot requirements + Facility evidence
+           │                                      │
+           ▼                                      ▼
+Structured facility state  ──(future)──>  Deterministic constraint verification
+(what physically exists)                  (does robot requirement agree with evidence?)
+```
+
+> [!IMPORTANT]
+> **No Runtime Integration Today**: Facility evidence may come from existing GLB/CAD/map assets or from systems that construct structured spatial state. SignalWeave's `spatial-ai` explores one such path from RGB-D/LiDAR observations to measurable physical entities. Robot Preflight consumes structured facility evidence and verifies robot deployment constraints against it. Today these repositories are separate open-source components with **no automatic runtime integration**.
 
 ---
 
@@ -77,13 +103,12 @@ sources of truth:
 | **5. What the fleet is configured to do** | Zones, restrictions, endpoints | Field Applications |
 | **6. What actually happens on the floor** | Telemetry, faults, interventions | Operations |
 
-Today, **Robot Preflight focuses strictly on reconciling Truth 2 (the facility) and Truth 3 (the robot)**,
-using manually declared context from **Truth 1 (the mission)**.
+### Mapping the Six Truths to SignalWeave Components
 
-Truths 4, 5, and 6 are downstream:
-* A verified constraint produced by Robot Preflight can inform simulation parameters (Truth 4).
-* A verified constraint can serve as an acceptance criterion for OEM zone configuration (Truth 5).
-* Robot Preflight does not monitor live telemetry (Truth 6).
+* **`spatial-ai` primarily contributes to Truth 2**: it reconstructs persistent physical entities and metric geometry from sensor observations.
+* **`robot-preflight` starts reconciling Truth 2 and Truth 3**: it deterministically checks whether sourced robot requirements are satisfied by facility evidence.
+* **Mission context from Truth 1 is still mostly external and manual today**: the user designates target span entities and coordinate axes.
+* **Truths 4–6 remain downstream**: simulation predictions (Truth 4), fleet manager zone configurations (Truth 5), and live operational telemetry (Truth 6) occur after preflight verification.
 
 ---
 

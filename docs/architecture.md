@@ -14,8 +14,10 @@ Robot requirement  +  Facility geometry
       PASS  /  BLOCKED  /  REVIEW
 ```
 
-AI can help interpret a requirement and its deployment context. Physical
-measurements come from explicit geometry. Compatibility decisions remain
+Robot Preflight turns sourced robot requirements and facility evidence into
+inspectable deployment constraint checks before simulation and commissioning.
+Task-aware grounding and multi-constraint preflight are next.
+Physical measurements come from explicit geometry. Compatibility decisions remain
 deterministic and inspectable.
 
 ## Decision vocabulary
