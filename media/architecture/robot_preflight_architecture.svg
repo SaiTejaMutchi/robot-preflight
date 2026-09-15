@@ -1,0 +1,278 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1280 720" width="1280" height="720">
+  <defs>
+    <!-- Background Gradient -->
+    <linearGradient id="bg-grad" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#080C14"/>
+      <stop offset="50%" stop-color="#0D1321"/>
+      <stop offset="100%" stop-color="#0A0F1D"/>
+    </linearGradient>
+
+    <!-- Card Gradients -->
+    <linearGradient id="card-input-robot" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#111C30"/>
+      <stop offset="100%" stop-color="#0D1525"/>
+    </linearGradient>
+    <linearGradient id="card-input-fac" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#181928"/>
+      <stop offset="100%" stop-color="#121320"/>
+    </linearGradient>
+    <linearGradient id="card-preflight" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0E2638"/>
+      <stop offset="100%" stop-color="#091A29"/>
+    </linearGradient>
+    <linearGradient id="card-output" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#0B2822"/>
+      <stop offset="100%" stop-color="#081D19"/>
+    </linearGradient>
+    <linearGradient id="card-downstream" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" stop-color="#121722"/>
+      <stop offset="100%" stop-color="#0E121B"/>
+    </linearGradient>
+
+    <!-- Arrow Markers -->
+    <marker id="arrow-cyan" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#00E5C8"/>
+    </marker>
+    <marker id="arrow-blue" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#38BDF8"/>
+    </marker>
+    <marker id="arrow-amber" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#F59E0B"/>
+    </marker>
+    <marker id="arrow-green" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#10B981"/>
+    </marker>
+    <marker id="arrow-dashed" viewBox="0 0 10 10" refX="6" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+      <path d="M 0 1.5 L 8 5 L 0 8.5 z" fill="#64748B"/>
+    </marker>
+
+    <!-- Drop Shadows -->
+    <filter id="glow-preflight" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="4" stdDeviation="12" flood-color="#00E5C8" flood-opacity="0.18"/>
+    </filter>
+  </defs>
+
+  <style>
+    .mono { font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace; }
+    .sans { font-family: ui-sans-serif, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif; }
+  </style>
+
+  <!-- Background Canvas -->
+  <rect width="1280" height="720" fill="url(#bg-grad)"/>
+
+  <!-- Subtle Blueprint Grid Pattern -->
+  <g stroke="#1E293B" stroke-width="1" opacity="0.28">
+    <line x1="60" y1="0" x2="60" y2="720"/>
+    <line x1="220" y1="0" x2="220" y2="720"/>
+    <line x1="420" y1="0" x2="420" y2="720"/>
+    <line x1="780" y1="0" x2="780" y2="720"/>
+    <line x1="980" y1="0" x2="980" y2="720"/>
+    <line x1="1220" y1="0" x2="1220" y2="720"/>
+    <line x1="0" y1="80" x2="1280" y2="80"/>
+    <line x1="0" y1="360" x2="1280" y2="360"/>
+    <line x1="0" y1="640" x2="1280" y2="640"/>
+  </g>
+
+  <!-- TOP HEADER / CATEGORY -->
+  <g transform="translate(80, 52)">
+    <rect x="0" y="-16" width="170" height="24" rx="4" fill="#1E293B" stroke="#334155" stroke-width="1"/>
+    <text x="85" y="0" class="sans" font-size="11" font-weight="600" fill="#94A3B8" text-anchor="middle" letter-spacing="1.2">SYSTEM ARCHITECTURE</text>
+    <text x="190" y="2" class="sans" font-size="18" font-weight="600" fill="#F8FAFC">
+      Robot requirements + facility geometry <tspan fill="#00E5C8">→</tspan> verified constraints
+    </text>
+  </g>
+
+  <!-- ==================== 1. ROBOT INPUT BLOCK ==================== -->
+  <g transform="translate(80, 120)">
+    <rect width="260" height="200" rx="8" fill="url(#card-input-robot)" stroke="#1E3A5F" stroke-width="1.5"/>
+    <!-- Header bar -->
+    <rect width="260" height="44" rx="8" fill="#13233D"/>
+    <rect y="36" width="260" height="8" fill="#13233D"/>
+    <line x1="0" y1="44" x2="260" y2="44" stroke="#1E3A5F" stroke-width="1.5"/>
+    <circle cx="24" cy="22" r="5" fill="#38BDF8"/>
+    <text x="38" y="27" class="sans" font-size="14" font-weight="700" fill="#E0F2FE" letter-spacing="0.8">ROBOT</text>
+    <text x="242" y="26" class="mono" font-size="11" fill="#38BDF8" text-anchor="end">INPUT 01</text>
+
+    <!-- Body contents -->
+    <g transform="translate(24, 68)">
+      <text x="0" y="16" class="sans" font-size="13" font-weight="600" fill="#F1F5F9">• Requirements</text>
+      <text x="12" y="34" class="mono" font-size="11" fill="#94A3B8">manufacturer spec sheets</text>
+
+      <text x="0" y="62" class="sans" font-size="13" font-weight="600" fill="#F1F5F9">• Physical Limits</text>
+      <text x="12" y="80" class="mono" font-size="11" fill="#94A3B8">clearance, grade, speed</text>
+
+      <text x="0" y="108" class="sans" font-size="13" font-weight="600" fill="#F1F5F9">• Configuration</text>
+      <text x="12" y="126" class="mono" font-size="11" fill="#94A3B8">payload &amp; attachments</text>
+    </g>
+  </g>
+
+  <!-- ==================== 2. FACILITY INPUT BLOCK ==================== -->
+  <g transform="translate(80, 360)">
+    <rect width="260" height="200" rx="8" fill="url(#card-input-fac)" stroke="#382E20" stroke-width="1.5"/>
+    <!-- Header bar -->
+    <rect width="260" height="44" rx="8" fill="#261F15"/>
+    <rect y="36" width="260" height="8" fill="#261F15"/>
+    <line x1="0" y1="44" x2="260" y2="44" stroke="#382E20" stroke-width="1.5"/>
+    <circle cx="24" cy="22" r="5" fill="#F59E0B"/>
+    <text x="38" y="27" class="sans" font-size="14" font-weight="700" fill="#FEF3C7" letter-spacing="0.8">FACILITY</text>
+    <text x="242" y="26" class="mono" font-size="11" fill="#F59E0B" text-anchor="end">INPUT 02</text>
+
+    <!-- Body contents -->
+    <g transform="translate(24, 68)">
+      <text x="0" y="16" class="sans" font-size="13" font-weight="600" fill="#F1F5F9">• Geometry</text>
+      <text x="12" y="34" class="mono" font-size="11" fill="#94A3B8">glTF / GLB / CAD / BIM</text>
+
+      <text x="0" y="62" class="sans" font-size="13" font-weight="600" fill="#F1F5F9">• Entities</text>
+      <text x="12" y="80" class="mono" font-size="11" fill="#94A3B8">named racks, doors, aisles</text>
+
+      <text x="0" y="108" class="sans" font-size="13" font-weight="600" fill="#F1F5F9">• Spatial Evidence</text>
+      <text x="12" y="126" class="mono" font-size="11" fill="#94A3B8">bounds, poses, meshes</text>
+    </g>
+  </g>
+
+  <!-- CONNECTOR PATHS: Inputs -> Preflight -->
+  <path d="M 340 220 C 385 220, 395 300, 440 315" fill="none" stroke="#38BDF8" stroke-width="2" stroke-opacity="0.7" marker-end="url(#arrow-blue)"/>
+  <path d="M 340 460 C 385 460, 395 380, 440 365" fill="none" stroke="#F59E0B" stroke-width="2" stroke-opacity="0.7" marker-end="url(#arrow-amber)"/>
+
+  <!-- ==================== 3. ROBOT PREFLIGHT (CORE WEDGE) ==================== -->
+  <g transform="translate(448, 140)" filter="url(#glow-preflight)">
+    <!-- Main Box -->
+    <rect width="370" height="400" rx="10" fill="url(#card-preflight)" stroke="#00E5C8" stroke-width="2"/>
+
+    <!-- Header bar -->
+    <rect width="370" height="56" rx="10" fill="#0A2A38"/>
+    <rect y="46" width="370" height="10" fill="#0A2A38"/>
+    <line x1="0" y1="56" x2="370" y2="56" stroke="#00E5C8" stroke-width="1.5" stroke-opacity="0.6"/>
+
+    <circle cx="28" cy="28" r="7" fill="#00E5C8"/>
+    <text x="46" y="34" class="sans" font-size="17" font-weight="800" fill="#FFFFFF" letter-spacing="1.2">ROBOT PREFLIGHT</text>
+    <rect x="264" y="18" width="86" height="20" rx="4" fill="#003830" stroke="#00E5C8" stroke-width="1"/>
+    <text x="307" y="32" class="mono" font-size="10" font-weight="700" fill="#00E5C8" text-anchor="middle">CORE ENGINE</text>
+
+    <!-- Subheader badge -->
+    <text x="185" y="84" class="sans" font-size="12" font-weight="600" fill="#7DD3FC" text-anchor="middle" letter-spacing="0.5">
+      DETERMINISTIC VERIFICATION PIPELINE
+    </text>
+
+    <!-- 4 Pipeline Steps -->
+    <g transform="translate(24, 104)">
+      <!-- Step 1: Interpret -->
+      <rect x="0" y="0" width="322" height="44" rx="6" fill="#0B1B29" stroke="#163750" stroke-width="1"/>
+      <circle cx="22" cy="22" r="10" fill="#163750"/>
+      <text x="22" y="26" class="mono" font-size="11" font-weight="700" fill="#38BDF8" text-anchor="middle">1</text>
+      <text x="42" y="20" class="sans" font-size="13" font-weight="700" fill="#F8FAFC">Interpret</text>
+      <text x="42" y="34" class="mono" font-size="10" fill="#94A3B8">extract specification constraints &amp; tolerances</text>
+
+      <!-- Step 2: Ground -->
+      <rect x="0" y="54" width="322" height="44" rx="6" fill="#0B1B29" stroke="#163750" stroke-width="1"/>
+      <circle cx="22" cy="76" r="10" fill="#163750"/>
+      <text x="22" y="80" class="mono" font-size="11" font-weight="700" fill="#38BDF8" text-anchor="middle">2</text>
+      <text x="42" y="74" class="sans" font-size="13" font-weight="700" fill="#F8FAFC">Ground</text>
+      <text x="42" y="88" class="mono" font-size="10" fill="#94A3B8">bind requirements to named scene entities</text>
+
+      <!-- Step 3: Measure -->
+      <rect x="0" y="108" width="322" height="44" rx="6" fill="#0B1B29" stroke="#163750" stroke-width="1"/>
+      <circle cx="22" cy="130" r="10" fill="#163750"/>
+      <text x="22" y="134" class="mono" font-size="11" font-weight="700" fill="#38BDF8" text-anchor="middle">3</text>
+      <text x="42" y="128" class="sans" font-size="13" font-weight="700" fill="#F8FAFC">Measure</text>
+      <text x="42" y="142" class="mono" font-size="10" fill="#00E5C8">deterministic nearest-face geometry query</text>
+
+      <!-- Step 4: Verify -->
+      <rect x="0" y="162" width="322" height="44" rx="6" fill="#0B1B29" stroke="#163750" stroke-width="1"/>
+      <circle cx="22" cy="184" r="10" fill="#163750"/>
+      <text x="22" y="188" class="mono" font-size="11" font-weight="700" fill="#38BDF8" text-anchor="middle">4</text>
+      <text x="42" y="182" class="sans" font-size="13" font-weight="700" fill="#F8FAFC">Verify</text>
+      <text x="42" y="196" class="mono" font-size="10" fill="#94A3B8">evaluate tolerance margin &amp; generate decision</text>
+    </g>
+
+    <!-- Decision Triad Section -->
+    <g transform="translate(24, 324)">
+      <line x1="0" y1="0" x2="322" y2="0" stroke="#163750" stroke-width="1"/>
+      <text x="161" y="18" class="sans" font-size="10" font-weight="700" fill="#64748B" text-anchor="middle" letter-spacing="1.2">DECISION VOCABULARY</text>
+
+      <!-- PASS -->
+      <rect x="4" y="28" width="98" height="32" rx="5" fill="#062D1F" stroke="#10B981" stroke-width="1.5"/>
+      <text x="53" y="49" class="mono" font-size="12" font-weight="800" fill="#34D399" text-anchor="middle">PASS</text>
+
+      <!-- BLOCKED -->
+      <rect x="112" y="28" width="98" height="32" rx="5" fill="#2D0B0E" stroke="#EF4444" stroke-width="1.5"/>
+      <text x="161" y="49" class="mono" font-size="12" font-weight="800" fill="#F87171" text-anchor="middle">BLOCKED</text>
+
+      <!-- REVIEW -->
+      <rect x="220" y="28" width="98" height="32" rx="5" fill="#2D1F06" stroke="#F59E0B" stroke-width="1.5"/>
+      <text x="269" y="49" class="mono" font-size="12" font-weight="800" fill="#FBBF24" text-anchor="middle">REVIEW</text>
+    </g>
+  </g>
+
+  <!-- CONNECTOR PATH: Preflight -> Verified Constraints -->
+  <path d="M 820 340 L 890 340" fill="none" stroke="#00E5C8" stroke-width="2.5" marker-end="url(#arrow-cyan)"/>
+
+  <!-- ==================== 4. VERIFIED CONSTRAINTS (OUTPUT) ==================== -->
+  <g transform="translate(900, 230)">
+    <rect width="300" height="220" rx="8" fill="url(#card-output)" stroke="#10B981" stroke-width="1.5"/>
+    <!-- Header bar -->
+    <rect width="300" height="44" rx="8" fill="#0D382B"/>
+    <rect y="36" width="300" height="8" fill="#0D382B"/>
+    <line x1="0" y1="44" x2="300" y2="44" stroke="#10B981" stroke-width="1.5" stroke-opacity="0.6"/>
+    <circle cx="24" cy="22" r="5" fill="#10B981"/>
+    <text x="38" y="27" class="sans" font-size="13" font-weight="700" fill="#D1FAE5" letter-spacing="0.6">VERIFIED CONSTRAINTS</text>
+    <text x="282" y="26" class="mono" font-size="11" fill="#10B981" text-anchor="end">OUTPUT</text>
+
+    <!-- Body contents -->
+    <g transform="translate(22, 66)">
+      <rect x="0" y="0" width="256" height="36" rx="4" fill="#08201B" stroke="#0F4A38" stroke-width="1"/>
+      <text x="12" y="16" class="sans" font-size="11" font-weight="700" fill="#6EE7B7">• Deterministic Status</text>
+      <text x="12" y="29" class="mono" font-size="10" fill="#94A3B8">PASS / BLOCKED / REVIEW</text>
+
+      <rect x="0" y="46" width="256" height="36" rx="4" fill="#08201B" stroke="#0F4A38" stroke-width="1"/>
+      <text x="12" y="62" class="sans" font-size="11" font-weight="700" fill="#6EE7B7">• Signed Clear Margin</text>
+      <text x="12" y="75" class="mono" font-size="10" fill="#94A3B8">e.g. +5.594663 m clearance</text>
+
+      <rect x="0" y="92" width="256" height="36" rx="4" fill="#08201B" stroke="#0F4A38" stroke-width="1"/>
+      <text x="12" y="108" class="sans" font-size="11" font-weight="700" fill="#6EE7B7">• Audit JSON Artifact</text>
+      <text x="12" y="121" class="mono" font-size="10" fill="#94A3B8">hashes, entities, run provenance</text>
+    </g>
+  </g>
+
+  <!-- CONNECTOR PATH: Verified Constraints -> Downstream Stack -->
+  <!-- Downstream dashed connector -->
+  <path d="M 1050 452 L 1050 496" fill="none" stroke="#64748B" stroke-width="2" stroke-dasharray="5 4" marker-end="url(#arrow-dashed)"/>
+  <rect x="992" y="462" width="116" height="18" rx="3" fill="#0B0F17" stroke="#334155" stroke-width="1"/>
+  <text x="1050" y="474" class="mono" font-size="9" font-weight="600" fill="#94A3B8" text-anchor="middle">can feed / future</text>
+
+  <!-- ==================== 5. DOWNSTREAM ROBOT STACK (FUTURE / VISUALLY LIGHTER) ==================== -->
+  <g transform="translate(900, 508)">
+    <rect width="300" height="120" rx="8" fill="url(#card-downstream)" stroke="#475569" stroke-width="1.5" stroke-dasharray="6 4"/>
+    <g transform="translate(22, 24)">
+      <text x="0" y="0" class="sans" font-size="12" font-weight="700" fill="#94A3B8" letter-spacing="0.6">EXISTING ROBOT STACK</text>
+      <text x="256" y="-1" class="mono" font-size="9" fill="#64748B" text-anchor="end">DOWNSTREAM</text>
+
+      <!-- 4 Tools -->
+      <g transform="translate(0, 14)">
+        <rect x="0" y="0" width="120" height="28" rx="4" fill="#182030" stroke="#334155" stroke-width="1"/>
+        <text x="60" y="18" class="mono" font-size="10" fill="#CBD5E1" text-anchor="middle">Planner (ROS/Nav)</text>
+
+        <rect x="136" y="0" width="120" height="28" rx="4" fill="#182030" stroke="#334155" stroke-width="1"/>
+        <text x="196" y="18" class="mono" font-size="10" fill="#CBD5E1" text-anchor="middle">Physics Simulator</text>
+
+        <rect x="0" y="36" width="120" height="28" rx="4" fill="#182030" stroke="#334155" stroke-width="1"/>
+        <text x="60" y="54" class="mono" font-size="10" fill="#CBD5E1" text-anchor="middle">OEM Fleet Tools</text>
+
+        <rect x="136" y="36" width="120" height="28" rx="4" fill="#182030" stroke="#334155" stroke-width="1"/>
+        <text x="196" y="54" class="mono" font-size="10" fill="#CBD5E1" text-anchor="middle">Site Commissioning</text>
+      </g>
+    </g>
+  </g>
+
+  <!-- ==================== FOOTER ==================== -->
+  <g transform="translate(640, 674)">
+    <rect x="-380" y="-16" width="760" height="26" rx="13" fill="#0F172A" stroke="#1E293B" stroke-width="1"/>
+    <text x="0" y="1" class="sans" font-size="12" font-weight="600" fill="#94A3B8" text-anchor="middle">
+      <tspan fill="#38BDF8">AI interprets.</tspan>
+      <tspan fill="#64748B">  ·  </tspan>
+      <tspan fill="#00E5C8">Geometry verifies.</tspan>
+      <tspan fill="#64748B">  ·  </tspan>
+      <tspan fill="#94A3B8">Existing robot tools execute.</tspan>
+    </text>
+  </g>
+</svg>

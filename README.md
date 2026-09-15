@@ -2,13 +2,7 @@
 
 Verify robot requirements against facility geometry before commissioning.
 
-AMR deployment moves through facility layouts, robot specifications,
-simulation models, OEM configuration, controls, commissioning, and finally
-the physical floor. Each stage represents the same deployment differently.
-
-Robot Preflight starts with one narrow question:
-
-**Does this robot requirement agree with the physical geometry of this site?**
+![Robot Preflight Hero Loop](media/hero/robot_preflight_hero.webp)
 
 ## Verified example
 
@@ -43,6 +37,15 @@ This is supporting evidence, not the proof — the reproducible computation
 below is the actual artifact.
 
 ## Why this exists
+
+AMR deployment moves through facility layouts, robot specifications,
+simulation models, OEM configuration, controls, commissioning, and finally
+the physical floor. Each stage represents the same deployment differently.
+
+Robot Preflight starts with one narrow question:
+
+**Does this robot requirement agree with the physical geometry of this site?**
+
 
 AMR deployment does not happen inside one system. The same deployment gets
 represented as mission and throughput requirements, a facility layout or
@@ -285,19 +288,8 @@ PASS
 
 ## Architecture
 
-```
-Robot requirement  +  Facility geometry
-                ↓
-        Requirement grounding
-                ↓
-      Deterministic geometry query
-                ↓
-            Measurement
-                ↓
-       Compatibility decision
-                ↓
-      PASS  /  BLOCKED  /  REVIEW
-```
+![Robot Preflight Architecture](media/architecture/robot_preflight_architecture.svg)
+
 
 AI can help interpret a requirement and deployment context. Physical
 measurements come from explicit geometry. Compatibility decisions remain
