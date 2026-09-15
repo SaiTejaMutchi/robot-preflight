@@ -1,0 +1,6 @@
+{
+  "name": "SpatialGrid.WarehouseGeometry",
+  "rootNamespace": "SpatialGrid.WarehouseGeometry",
+  "references": ["glTFast"],
+  "autoReferenced": true
+}

@@ -1,0 +1,62 @@
+{
+  "schema_version": "1.0",
+  "run_id": "geo003-20260910-144434",
+  "robot": {
+    "manufacturer": "OTTO Motors by Rockwell Automation",
+    "model": "OTTO 1500"
+  },
+  "check": {
+    "name": "Geometry preflight — one-way aisle-width check",
+    "constraint_id": "OTTO-1500-MIN-AISLE-WIDTH-ONE-WAY"
+  },
+  "requirement": {
+    "required_value_m": 1.915,
+    "unit": "m",
+    "tolerance_m": 0.005,
+    "source_document": "OTTO 1500 Spec Sheet",
+    "source_document_id": "OTTO-DS001D-EN-APR2024",
+    "source_page": 1,
+    "source_text": "Min. Aisle Width 1915 mm (78 in) (One Way)",
+    "source_pdf_sha256": "3e998d79ac17cb8e41a61ac0017af4e64a27337c97cbf1684a72639a4c614b2f"
+  },
+  "measurement": {
+    "measured_value_m": 7.509663,
+    "signed_difference_m": 5.594663,
+    "status": "PASS",
+    "method": "AisleClearanceChecker.Check(boundaryA_bounds, boundaryB_bounds, ClearanceAxis.X, required=1.915) — nearest-face world-space gap between the two boundary renderer bounds, clamped at 0; executed in Unity 6000.3.9f1 Play Mode via real glTFast import (NameImportMethod.OriginalUnique) of the derived GLB",
+    "boundary_a": "aws_robomaker_warehouse_ShelfF_01_001",
+    "boundary_b": "aws_robomaker_warehouse_ShelfD_01_001",
+    "blocker_binding": "none (status=PASS, no blocking region)",
+    "cross_validation_offline_python_m": 7.509662,
+    "cross_validation_note": "Independently computed via Tools/WarehouseGeometry/validate_independent_warehouse_glb.py against the same derived GLB before the Unity run; agrees with the Unity Play Mode result to within 1 micrometer (float rounding only)"
+  },
+  "environment_source": {
+    "name": "AWS RoboMaker Small Warehouse World",
+    "producer": "Amazon Web Services / aws-robotics",
+    "repository": "https://github.com/aws-robotics/aws-robomaker-small-warehouse-world",
+    "frozen_revision": "3c23a698bf0b4e366ddf8b084af507c519bd3483",
+    "license": "MIT-0 (MIT No Attribution)",
+    "source_scene_path": "worlds/small_warehouse.world",
+    "source_scene_sha256": "4a7d96866367df85668b09a71c60ce3a2807e7d3fe05df77a0edc62a1fa8e263",
+    "derived_glb_path": "Assets/StreamingAssets/WarehouseGeometry/aws_independent_warehouse.glb",
+    "derived_glb_sha256": "09a9a7d289fed16d710326a7676b3cabb0d71c4bbb00f3f62fbf2c1f27436da6",
+    "conversion_method": "COLLADA (.DAE) visual meshes for the two boundary shelf models extracted directly from the frozen source archive, converted individually to GLB via assimp 6.0.5 (assimp export), then merged into one scene via a custom pygltflib script (Tools-adjacent, see evidence/environments/warehouse_measurement_preregistration.md §Measurement method) that places each shelf at its exact frozen SDF world pose converted from Z-up/centimeters to Y-up/meters (glTF_X=SDF_X, glTF_Y=SDF_Z, glTF_Z=-SDF_Y); materials/images/textures were stripped from the merge (geometry-only) after the first merge attempt failed Unity's strict GLB image-URI validation — confirmed via a from-scratch second Khronos gltf-validator pass with 0 errors before the accepted Unity run",
+    "preregistration_commit": "810b524",
+    "preregistration_file": "evidence/environments/warehouse_measurement_preregistration.md",
+    "superseding_file_state": {
+      "note": "The derived_glb_path file was legitimately modified after this record was generated: commit 3b46d6b5c12dbd4d672c263a91f7dd6d95021e89 (2026-09-10, task CON-001-MIN/ENV-003) added walls, roof, floor, and 5 additional shelf instances to the same StreamingAssets path for full-scene visualization. That commit's message documents re-running this exact GEO-003 test, unmodified, against the enlarged scene and getting a byte-identical-to-six-decimals result (required=1.915m available=7.509663m difference=+5.594663m status=Pass), satisfying ENV-003's 'no geometry may be repositioned to manufacture a more dramatic result' acceptance criterion. The derived_glb_sha256 field above was not updated at that time and therefore no longer matches the file currently at derived_glb_path -- it correctly documents the file as it existed at GEO-003 time (this run_id), not the current working tree. Discovered while building the robot_preflight SDK's scripts/verify_reference_result.py, which hashes the current file and needed the current value to avoid reporting a false mismatch.",
+      "derived_glb_sha256_current": "7a4a6539f7eaadfa8c3a268485c45ed64ebd677c6d5c92d1d26738738e2e27c4",
+      "current_as_of_commit": "3b46d6b5c12dbd4d672c263a91f7dd6d95021e89",
+      "measurement_unaffected": true
+    }
+  },
+  "runtime": {
+    "unity_version": "6000.3.9f1",
+    "test_platform": "PlayMode",
+    "test_class": "SpatialGrid.WarehouseGeometry.IndependentTests.GEO003IndependentMeasurementTest",
+    "test_method": "MeasureIndependentAisle",
+    "evidence_log": "evidence/environments/logs/geo003_playmode_20260910_104419_attempt3.log",
+    "evidence_results_xml": "evidence/environments/logs/geo003_playmode_results_20260910_104419_attempt3.xml"
+  },
+  "generated_at": "2026-09-10T14:44:34Z"
+}

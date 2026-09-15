@@ -1,0 +1,11 @@
+{
+  "name": "SpatialGrid.ReviewerDemo",
+  "rootNamespace": "SpatialGrid.ReviewerDemo",
+  "references": [
+    "SpatialGrid.WarehouseGeometry",
+    "glTFast",
+    "Unity.TextMeshPro",
+    "UnityEngine.UI"
+  ],
+  "autoReferenced": true
+}

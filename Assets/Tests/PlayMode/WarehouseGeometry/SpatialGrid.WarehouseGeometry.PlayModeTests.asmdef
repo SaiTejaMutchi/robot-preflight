@@ -1,0 +1,7 @@
+{
+  "name": "SpatialGrid.WarehouseGeometry.PlayModeTests",
+  "rootNamespace": "SpatialGrid.WarehouseGeometry.PlayModeTests",
+  "references": ["SpatialGrid.WarehouseGeometry"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

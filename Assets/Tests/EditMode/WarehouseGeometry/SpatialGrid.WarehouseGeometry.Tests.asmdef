@@ -1,0 +1,8 @@
+{
+  "name": "SpatialGrid.WarehouseGeometry.Tests",
+  "rootNamespace": "SpatialGrid.WarehouseGeometry.Tests",
+  "references": ["SpatialGrid.WarehouseGeometry"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false
+}

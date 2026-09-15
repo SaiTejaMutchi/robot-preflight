@@ -1,0 +1,63 @@
+# Unity generated directories (root-level only -- do not shadow
+# evidence/environments/logs/, which holds deliberately-kept evidence)
+/[Ll]ibrary/
+/[Tt]emp/
+/[Oo]bj/
+/[Bb]uild/
+/[Bb]uilds/
+/[Ll]ogs/
+/[Uu]ser[Ss]ettings/
+/.utmp/
+
+# Unity recovery and crash artifacts
+Assets/_Recovery/
+sysinfo.txt
+
+# IDE/editor state
+.vs/
+.vscode/
+.idea/
+*.csproj
+*.sln
+*.suo
+*.tmp
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.pdb
+*.mdb
+*.opendb
+*.VC.db
+
+# Build products and symbols
+*.apk
+*.aab
+*.unitypackage
+*.app
+*.ipa
+*.exe
+*.dll
+*.so
+*.dylib
+*.aar
+*.symbols.zip
+
+# OS metadata
+.DS_Store
+Thumbs.db
+
+# Local secrets/configuration
+.env
+.env.*
+!.env.example
+*.keystore
+*.jks
+
+__pycache__/
+*.egg-info/
+.pytest_cache/
+.venv/
+build/
+dist/

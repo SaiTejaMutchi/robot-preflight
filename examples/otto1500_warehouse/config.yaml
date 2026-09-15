@@ -1,0 +1,33 @@
+# Canonical Robot Preflight example.
+#
+# Every value here is real: the robot requirement is sourced from a hashed
+# OTTO 1500 manufacturer PDF, the facility geometry is a real file in this
+# repository, and the entity names are the exact node names selected and
+# preregistered in
+# evidence/environments/warehouse_measurement_preregistration.md before the
+# frozen result was produced.
+
+robot:
+  id: otto_1500
+
+facility:
+  geometry: Assets/StreamingAssets/WarehouseGeometry/aws_independent_warehouse.glb
+  source: >-
+    AWS RoboMaker Small Warehouse World (aws-robotics/aws-robomaker-small-warehouse-world,
+    frozen revision 3c23a698bf0b4e366ddf8b084af507c519bd3483, MIT-0), independently
+    sourced (not authored for this example). See
+    evidence/environments/independent_environment_record.md and
+    evidence/results/otto1500_warehouse.json for full provenance.
+
+constraint:
+  type: aisle_clearance
+  required_m: 1.915
+  tolerance_m: 0.005
+
+measurement:
+  axis: X
+  entity_a: aws_robomaker_warehouse_ShelfF_01_001
+  entity_b: aws_robomaker_warehouse_ShelfD_01_001
+  method: >-
+    Nearest-face world-space gap between the two named entities' combined
+    renderer bounds along the X axis, clamped at 0.

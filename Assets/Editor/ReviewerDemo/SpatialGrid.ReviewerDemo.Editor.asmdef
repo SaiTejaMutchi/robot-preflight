@@ -1,0 +1,13 @@
+{
+  "name": "SpatialGrid.ReviewerDemo.Editor",
+  "rootNamespace": "SpatialGrid.ReviewerDemo.Editor",
+  "references": [
+    "SpatialGrid.ReviewerDemo",
+    "SpatialGrid.WarehouseGeometry",
+    "Unity.TextMeshPro",
+    "Unity.TextMeshPro.Editor",
+    "UnityEngine.UI"
+  ],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": true
+}

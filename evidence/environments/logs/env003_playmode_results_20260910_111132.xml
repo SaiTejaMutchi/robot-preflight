@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<test-run id="2" testcasecount="2" result="Passed" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0" engine-version="3.5.0.0" clr-version="4.0.30319.42000" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.7409632">
+  <test-suite type="TestSuite" id="1016" name="SG-VR" fullname="SG-VR" runstate="Runnable" testcasecount="2" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.740963" total="2" passed="2" failed="0" inconclusive="0" skipped="0" asserts="0">
+    <properties>
+      <property name="platform" value="PlayMode" />
+    </properties>
+    <test-suite type="Assembly" id="1003" name="SpatialGrid.WarehouseGeometry.IndependentTests.dll" fullname="/Users/<redacted-local-user>/Desktop/Repos/Platform VR/SpatialGrid-VR/Library/ScriptAssemblies/SpatialGrid.WarehouseGeometry.IndependentTests.dll" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.096296" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="51129" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1004" name="SpatialGrid" fullname="SpatialGrid" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.095710" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1005" name="WarehouseGeometry" fullname="SpatialGrid.WarehouseGeometry" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.095393" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1006" name="IndependentTests" fullname="SpatialGrid.WarehouseGeometry.IndependentTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.095038" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1001" name="GEO003IndependentMeasurementTest" fullname="SpatialGrid.WarehouseGeometry.IndependentTests.GEO003IndependentMeasurementTest" classname="SpatialGrid.WarehouseGeometry.IndependentTests.GEO003IndependentMeasurementTest" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.094200" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1002" name="MeasureIndependentAisle" fullname="SpatialGrid.WarehouseGeometry.IndependentTests.GEO003IndependentMeasurementTest.MeasureIndependentAisle" methodname="MeasureIndependentAisle" classname="SpatialGrid.WarehouseGeometry.IndependentTests.GEO003IndependentMeasurementTest" runstate="Runnable" seed="1592443743" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.086177" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[GEO003_IMPORT root=Independent_Warehouse_Root renderers=10 entities=32 duplicates=0
+GEO003_BOUNDS boundaryA_min=(4.74, 0.00, -8.07) boundaryA_max=(6.85, 6.53, 9.98) boundaryB_min=(-6.69, 0.00, 0.80) boundaryB_max=(-2.77, 2.61, 1.68)
+GEO003_INDEPENDENT_RESULT required=1.915000m available=7.509663m difference=+5.594663m status=Pass boundaryA=aws_robomaker_warehouse_ShelfF_01_001 boundaryB=aws_robomaker_warehouse_ShelfD_01_001 axis=X sourceFile=WarehouseGeometry/aws_independent_warehouse.glb
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+    <test-suite type="Assembly" id="1009" name="SpatialGrid.WarehouseGeometry.PlayModeTests.dll" fullname="/Users/<redacted-local-user>/Desktop/Repos/Platform VR/SpatialGrid-VR/Library/ScriptAssemblies/SpatialGrid.WarehouseGeometry.PlayModeTests.dll" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.638167" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+      <properties>
+        <property name="_PID" value="51129" />
+        <property name="_APPDOMAIN" value="Unity Child Domain" />
+        <property name="platform" value="PlayMode" />
+        <property name="EditorOnly" value="False" />
+      </properties>
+      <test-suite type="TestSuite" id="1010" name="SpatialGrid" fullname="SpatialGrid" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.637694" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+        <properties />
+        <test-suite type="TestSuite" id="1011" name="WarehouseGeometry" fullname="SpatialGrid.WarehouseGeometry" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.637390" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+          <properties />
+          <test-suite type="TestSuite" id="1012" name="PlayModeTests" fullname="SpatialGrid.WarehouseGeometry.PlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.637041" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+            <properties />
+            <test-suite type="TestFixture" id="1007" name="WarehouseGeometryPlayModeTests" fullname="SpatialGrid.WarehouseGeometry.PlayModeTests.WarehouseGeometryPlayModeTests" classname="SpatialGrid.WarehouseGeometry.PlayModeTests.WarehouseGeometryPlayModeTests" runstate="Runnable" testcasecount="1" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.636692" total="1" passed="1" failed="0" inconclusive="0" skipped="0" asserts="0">
+              <properties />
+              <test-case id="1008" name="PublicRackAssembly_RuntimeMeasuresBlockedAtOnePointSevenFiveMeters" fullname="SpatialGrid.WarehouseGeometry.PlayModeTests.WarehouseGeometryPlayModeTests.PublicRackAssembly_RuntimeMeasuresBlockedAtOnePointSevenFiveMeters" methodname="PublicRackAssembly_RuntimeMeasuresBlockedAtOnePointSevenFiveMeters" classname="SpatialGrid.WarehouseGeometry.PlayModeTests.WarehouseGeometryPlayModeTests" runstate="Runnable" seed="1366359261" result="Passed" start-time="2026-09-10 15:11:47Z" end-time="2026-09-10 15:11:47Z" duration="0.635944" asserts="0">
+                <properties>
+                  <property name="_JOINTYPE" value="UnityCombinatorial" />
+                  <property name="retryIteration" value="0" />
+                  <property name="repeatIteration" value="0" />
+                </properties>
+                <output><![CDATA[1
+PLAYMODE_SCENE_ROOTS Main Camera,Directional Light,WarehouseGeometryTest
+WAREHOUSE_IMPORT root=Warehouse_Public_Source position=(0.00, 0.00, 0.00) rotation=(0.00, 0.00, 0.00) scale=(1.00, 1.00, 1.00) boundsCenter=(0.00, 1.10, 0.00) boundsSize=(8.00, 2.40, 6.00) renderers=6 entities=9 duplicates=1
+WAREHOUSE_ENTITIES Rack_Left=Rack_Left Rack_Right=Rack_Right Aisle_01=Aisle_01 Blocker_Region_01=Blocker_Region_01
+WAREHOUSE_TEST required=1.915m available=1.750m difference=-0.165m status=Blocked
+WAREHOUSE_ACCEPTANCE legacyBypassed=true compressionRequired=false
+PLAYMODE_RESULT required=1.915 available=1.750 difference=-0.165 status=Blocked
+PLAYMODE_SCREENSHOT path=/Users/<redacted-local-user>/Desktop/Repos/Platform VR/SpatialGrid-VR/Assets/../blueprint/evidence/runtime/playmode_public_rack_screenshot.png exists=True bytes=244584
+Saving results to: /Users/<redacted-local-user>/Library/Application Support/SpatialGrid/SG-VR/TestResults.xml
+]]></output>
+              </test-case>
+            </test-suite>
+          </test-suite>
+        </test-suite>
+      </test-suite>
+    </test-suite>
+  </test-suite>
+</test-run>

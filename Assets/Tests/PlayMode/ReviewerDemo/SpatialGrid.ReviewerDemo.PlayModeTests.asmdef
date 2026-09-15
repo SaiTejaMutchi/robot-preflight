@@ -1,0 +1,11 @@
+{
+  "name": "SpatialGrid.ReviewerDemo.PlayModeTests",
+  "rootNamespace": "SpatialGrid.ReviewerDemo.PlayModeTests",
+  "references": [
+    "SpatialGrid.ReviewerDemo",
+    "SpatialGrid.WarehouseGeometry",
+    "Unity.TextMeshPro"
+  ],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

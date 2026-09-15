@@ -1,0 +1,11 @@
+{
+  "name": "SpatialGrid.ReviewerDemo.Tests",
+  "rootNamespace": "SpatialGrid.ReviewerDemo.Tests",
+  "references": [
+    "SpatialGrid.ReviewerDemo",
+    "SpatialGrid.WarehouseGeometry"
+  ],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "includePlatforms": ["Editor"],
+  "autoReferenced": false
+}

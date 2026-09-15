@@ -1,0 +1,7 @@
+{
+  "name": "SpatialGrid.WarehouseGeometry.IndependentTests",
+  "rootNamespace": "SpatialGrid.WarehouseGeometry.IndependentTests",
+  "references": ["SpatialGrid.WarehouseGeometry", "glTFast"],
+  "optionalUnityReferences": ["TestAssemblies"],
+  "autoReferenced": false
+}

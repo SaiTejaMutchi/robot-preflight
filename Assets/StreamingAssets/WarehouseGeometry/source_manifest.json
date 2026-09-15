@@ -1,0 +1,16 @@
+{
+  "classification": "PUBLIC_SYNTHETIC_WAREHOUSE_COMPONENT",
+  "title": "Industrial Storage Unit 3D Models - SB1",
+  "author": "Daniel Rosehill",
+  "license": "CC BY 4.0",
+  "sourceUrl": "https://github.com/danielrosehill/storage-box-3d-models/blob/main/models/SB1/SB1.glb",
+  "sourceDimensionsMeters": [1.6, 0.6, 2.3],
+  "sourceTriangles": 924,
+  "generatedPublicClearanceMeters": 1.75,
+  "generatedControlledClearanceMeters": 0.94,
+  "requiredClearanceMeters": 1.915,
+  "axis": "Z",
+  "floorY": 0.0,
+  "compression": "none",
+  "textures": 0
+}

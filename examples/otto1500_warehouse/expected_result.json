@@ -1,0 +1,11 @@
+{
+  "_note": "Reference excerpt for humans/scripts to compare a fresh computation against. Not read by robot_preflight.Preflight.check(). Authoritative record: evidence/results/otto1500_warehouse.json",
+  "robot": "otto_1500",
+  "constraint": "aisle_clearance",
+  "required_m": 1.915,
+  "available_m_unity": 7.509663,
+  "available_m_independent_python": 7.509662,
+  "margin_m_unity": 5.594663,
+  "decision": "PASS",
+  "note_on_the_1um_difference": "Unity float and independent Python double computations of the same glTF bounds agree to within 1 micrometer; both are documented in evidence/results/otto1500_warehouse.json."
+}

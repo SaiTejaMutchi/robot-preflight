@@ -1,0 +1,32 @@
+{
+  "validator": "Tools/WarehouseGeometry/validate_warehouse_glb.py",
+  "runtimeEvidence": false,
+  "results": [
+    {
+      "file": "Assets/StreamingAssets/WarehouseGeometry/warehouse_source.glb",
+      "sha256": "5fcb83a718d1056cd67bcca7c368f9eec9155d234cefb1d9699156d9f6022353",
+      "bytes": 32892,
+      "nodes": 9,
+      "uniqueMeshTriangles": 960,
+      "materials": 4,
+      "textures": 0,
+      "availableMeters": 1.750,
+      "requiredMeters": 1.915,
+      "differenceMeters": -0.165,
+      "status": "BLOCKED"
+    },
+    {
+      "file": "Assets/StreamingAssets/WarehouseGeometry/warehouse_controlled_0_940m.glb",
+      "sha256": "97c755a0551621cbf8428e10870b8979726143a8833fe6ec19c675e09e664fc1",
+      "bytes": 1960,
+      "nodes": 6,
+      "uniqueMeshTriangles": 36,
+      "materials": 3,
+      "textures": 0,
+      "availableMeters": 0.940,
+      "requiredMeters": 1.915,
+      "differenceMeters": -0.975,
+      "status": "BLOCKED"
+    }
+  ]
+}
