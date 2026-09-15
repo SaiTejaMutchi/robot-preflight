@@ -33,7 +33,80 @@ warehouse environment — not a warehouse built to pass. The measurement is
 deterministic and was independently reproduced outside the main Unity
 execution path. The two computations agree to within 1 micrometer.
 
-[Run the example](#quickstart) · [Inspect the evidence](#dont-trust-the-screenshot-reproduce-it) · [See the architecture](#architecture) · [Current Capabilities Audit](docs/current-capabilities.md)
+[Run the example](#quickstart) · [Run on another facility](#run-on-another-facility) · [Inspect the evidence](#dont-trust-the-screenshot-reproduce-it) · [See the architecture](#architecture) · [Current Capabilities Audit](docs/current-capabilities.md)
+
+---
+
+## Run on another facility
+
+The frozen OTTO/AWS example is the independently evidenced reference result.
+
+The verifier itself is not tied to that GLB.
+
+Provide a compatible facility model and a config identifying the two entities that define the span to check.
+
+```yaml
+robot:
+  id: otto_1500
+
+facility:
+  geometry: ./my_facility.glb
+
+constraint:
+  type: aisle_clearance
+  required_m: 1.915
+  tolerance_m: 0.005
+
+measurement:
+  axis: X
+  entity_a: Rack_A
+  entity_b: Rack_B
+```
+
+Then run the check:
+
+```bash
+robot-preflight check ./my_facility
+```
+
+Today the user supplies the two facility entities manually.
+
+Robot Preflight does not yet identify the relevant aisle automatically.
+
+### Current facility input boundary
+
+Supported today:
+* Standard binary glTF 2.0 (`.glb`) files
+* Scene node hierarchy with mesh primitives
+* Explicit, unique node names defining the boundary entities (`entity_a` and `entity_b`)
+* World-space clearance computed dynamically from node transform matrices and accessor `POSITION` bounds
+* Portability across multiple compatible GLB artifacts demonstrated
+
+Not supported today:
+* Automatic semantic aisle detection
+* Automatic route or waypoint grounding
+* Direct CAD / STEP / DWG / IFC ingestion
+* Compressed geometry extensions (`EXT_meshopt_compression`, `KHR_draco_mesh_compression`)
+
+---
+
+## Portability smoke test
+
+The reference OTTO/AWS case is the independently evidenced engineering result.
+
+The second example exists only to prove that the same verifier can run against different facility geometry and different entity names without modifying verifier logic.
+
+| | Reference verification | Portability smoke test |
+|---|---|---|
+| Facility artifact | AWS RoboMaker warehouse (`aws_independent_warehouse.glb`) | Second GLB (`portable_fixture.glb`) |
+| Entity names | AWS shelf names (`..._ShelfF_01_001`, `..._ShelfD_01_001`) | Portability fixture names (`PortabilityRack_A`, `PortabilityRack_B`) |
+| Verifier | `aisle_clearance` | `aisle_clearance` |
+| Requirement | 1.915 m | 1.915 m |
+| Decision | **PASS** | **BLOCKED** |
+| Evidence standard | Full frozen reference | Portability only |
+| Purpose | Validate engineering check | Prove reusable implementation path |
+
+See [`examples/portability_facility`](examples/portability_facility) for the runnable configuration, synthetic artifact, and reproduction steps.
 
 ---
 
@@ -323,7 +396,7 @@ print(f"Margin: {result.margin_m:+.6f} m")
 Every claim in this repository is reproducible from source:
 
 ```bash
-make test    # Runs full unit test suite (8 tests)
+make test    # Runs full unit test suite (11 tests)
 make verify  # Verifies hashes, determinism, and 1 µm numeric agreement
 ```
 

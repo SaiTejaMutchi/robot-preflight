@@ -1,0 +1,29 @@
+# Portability smoke test example for Robot Preflight.
+#
+# This example uses a minimal synthetic binary glTF 2.0 fixture
+# (examples/portability_facility/portable_fixture.glb) generated specifically
+# to verify software portability: proving that the aisle_clearance verifier
+# runs dynamically against a second facility model with distinct geometry
+# and entity names, without hardcoding or changing verifier logic.
+#
+# Geometry is intentionally configured with an aisle span (1.600 m) narrower
+# than the OTTO 1500 requirement (1.915 m) to demonstrate the BLOCKED decision
+# state on a genuine computed measurement.
+
+robot:
+  id: otto_1500
+
+facility:
+  geometry: examples/portability_facility/portable_fixture.glb
+  source: synthetic portability fixture generated for verifier smoke testing
+
+constraint:
+  type: aisle_clearance
+  required_m: 1.915
+  tolerance_m: 0.005
+
+measurement:
+  axis: X
+  entity_a: PortabilityRack_A
+  entity_b: PortabilityRack_B
+  method: nearest-face world-space gap

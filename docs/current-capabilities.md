@@ -31,6 +31,7 @@ repository based on code inspection across Python, Unity, schemas, and evidence 
 | | Combined envelope (attachment + payload) | **NOT IMPLEMENTED** | No payload or attachment data fields in Python or Unity models | No — roadmap only |
 | **C. Facility Representation** | Binary glTF 2.0 (`.glb`) parsing | **VERIFIED** | `Tools/WarehouseGeometry/validate_independent_warehouse_glb.py:inspect`, glTFast in Unity | Yes — parses standard uncompressed binary glTF 2.0 |
 | | Arbitrary GLB consumption | **PARTIAL** | General parser exists, but requires unique node names and uncompressed meshes | Scoped — supports standard GLBs with unique node names |
+| | Second-artifact portability | **VERIFIED** | `examples/portability_facility`, `test_second_facility_artifact_portability` | Yes — same verifier demonstrated across multiple compatible facility artifacts |
 | | CAD / 2D map / scan ingestion | **NOT IMPLEMENTED** | Only `.glb` files supported; no STEP, DWG, DXF, or point-cloud loaders | No — GLB-only today |
 | **D. Deployment Task** | Task & route semantics (start, goal, zones) | **NOT IMPLEMENTED** | Zero task, waypoint, or route fields in schemas or runtime | No — task context is absent |
 | **E. Grounding** | Automatic entity identification | **NOT IMPLEMENTED** | User must manually specify `entity_a` and `entity_b` node names in `config.yaml` | No — grounding is explicit and manual |
@@ -61,6 +62,7 @@ repository based on code inspection across Python, Unity, schemas, and evidence 
 * **Decision Vocabulary**: PASS, BLOCKED, and REVIEW states are implemented in the arithmetic of both Python and C# engines.
 * **glTF Binary Parser**: General glTF 2.0 parsing logic exists in pure Python, but depends on node names being unique and uncompressed accessor buffers.
 * **CLI Exit Codes**: CLI returns `0` on PASS, `1` on BLOCKED or REVIEW, and `2` on execution error, suitable for basic CI gating.
+* **Portability Smoke Testing**: A synthetic facility fixture (`examples/portability_facility/portable_fixture.glb`) with distinct entities (`PortabilityRack_A`, `PortabilityRack_B`) verifies that the aisle clearance verifier executes dynamically against a separate GLB artifact and evaluates to BLOCKED, without altering verifier logic or reading precomputed data.
 
 ### 3. What is Manual Today
 * **Requirement Entry**: Requirements are not extracted by an automated agent or PDF ingestion pipeline; they are manually curated into `_ROBOT_REQUIREMENTS` and verified against hashed evidence records.

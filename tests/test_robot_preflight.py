@@ -150,3 +150,80 @@ def test_verifier_registry_exposure():
     from robot_preflight.core import Preflight
     assert Preflight.registry.is_supported("aisle_clearance")
     assert "aisle_clearance" in Preflight.registry.registered_types()
+
+
+def test_second_facility_artifact_portability():
+    """Verify that the aisle_clearance verifier dynamically computes clearance
+    against a completely separate facility artifact (portable_fixture.glb) with
+    different geometry and distinct entity names, yielding BLOCKED without any
+    code changes or reading stored results.
+    """
+    result = Preflight.check(
+        robot="otto_1500",
+        facility="examples/portability_facility",
+        constraint="aisle_clearance",
+    )
+    assert result.decision == "BLOCKED"
+    assert result.required_m == pytest.approx(1.915, abs=TOL_M)
+    assert result.available_m == pytest.approx(1.600, abs=TOL_M)
+    # Proves the value is computed from this fixture and not the reference result
+    assert result.available_m != pytest.approx(7.509662, abs=TOL_M)
+    assert result.margin_m == pytest.approx(-0.315, abs=TOL_M)
+    assert result.facility_entities == [
+        "PortabilityRack_A",
+        "PortabilityRack_B",
+    ]
+    assert result.evidence["geometry_file"] == "examples/portability_facility/portable_fixture.glb"
+    assert result.evidence["tolerance_m"] == 0.005
+
+
+def test_anti_hardcoding_verifier_structure():
+    """Ensure core and verifier modules contain no special-case branches or
+    hardcoded values for the portability fixture or reference results.
+    """
+    import ast
+
+    for rel_path in [
+        "robot_preflight/core.py",
+        "robot_preflight/verifiers/aisle_clearance.py",
+    ]:
+        source = (REPO_ROOT / rel_path).read_text()
+        tree = ast.parse(source)
+        docstring = ast.get_docstring(tree) or ""
+        code_only = source.replace(docstring, "", 1)
+        code_lines = [
+            line for line in code_only.splitlines() if not line.strip().startswith("#")
+        ]
+        forbidden = [
+            "portability_facility",
+            "portable_fixture",
+            "PortabilityRack",
+            "1.600",
+            "7.509662",
+            "ShelfF_01_001",
+            "ShelfD_01_001",
+        ]
+        for term in forbidden:
+            assert not any(term in line for line in code_lines), (
+                f"Found hardcoded/special-cased reference {term!r} in {rel_path}"
+            )
+
+
+def test_cli_portability_check_blocked():
+    """Verify the CLI exit code and formatted output on the portability example."""
+    from robot_preflight.__main__ import main
+    import io
+    from contextlib import redirect_stdout
+
+    buf = io.StringIO()
+    with redirect_stdout(buf):
+        exit_code = main(["check", "examples/portability_facility"])
+
+    assert exit_code == 1  # BLOCKED produces exit code 1
+    output = buf.getvalue()
+    assert "Robot        otto_1500" in output
+    assert "Constraint   aisle_clearance" in output
+    assert "Required     1.915000 m" in output
+    assert "Available    1.600000 m" in output
+    assert "Margin       -0.315000 m" in output
+    assert "Decision     BLOCKED" in output

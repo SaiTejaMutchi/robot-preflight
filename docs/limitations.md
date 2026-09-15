@@ -38,8 +38,10 @@ used consistently:
   1500 aisle-clearance check against the frozen AWS warehouse example.
 - **Implemented** — code exists and runs, but hasn't been independently
   re-verified the same way (e.g., the general robot/constraint/facility
-  config format works beyond the one shipped example, but no second
-  example has been built and evidenced).
+  config format works beyond the reference example, and is exercised by a
+  synthetic portability smoke test in `examples/portability_facility`, but only
+  the AWS warehouse has been independently evidenced end-to-end with physical
+  specification and dual-engine cross-validation).
 - **Planned** — roadmap only, not built: additional constraints, multiple
   robot configurations, planner integration, requalification triggers.
 
