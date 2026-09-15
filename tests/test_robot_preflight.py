@@ -118,3 +118,35 @@ def test_unknown_robot_constraint_pair_raises():
             facility="examples/otto1500_warehouse",
             constraint="aisle_clearance",
         )
+
+
+def test_decision_model_blocked_and_review():
+    """Verify that BLOCKED and REVIEW decision states are reachable in the verifier arithmetic."""
+    from robot_preflight.core import _geometry, REPO_ROOT
+    from robot_preflight.models import ClearanceStatus
+
+    geometry_path = str(REPO_ROOT / "Assets/StreamingAssets/WarehouseGeometry/aws_independent_warehouse.glb")
+    entity_a = "aws_robomaker_warehouse_ShelfF_01_001"
+    entity_b = "aws_robomaker_warehouse_ShelfD_01_001"
+    axis_index = 0  # X axis
+
+    # 1. PASS case (available ~ 7.509662 m > required 1.915 m)
+    pass_res = _geometry.inspect(geometry_path, entity_a, entity_b, axis_index, required_m=1.915, tolerance_m=0.005)
+    assert pass_res["status"] == ClearanceStatus.PASS
+
+    # 2. BLOCKED case (required 10.0 m > available ~ 7.509662 m, outside tolerance)
+    blocked_res = _geometry.inspect(geometry_path, entity_a, entity_b, axis_index, required_m=10.0, tolerance_m=0.005)
+    assert blocked_res["status"] == ClearanceStatus.BLOCKED
+    assert blocked_res["difference_m"] < 0
+
+    # 3. REVIEW case (|difference| <= tolerance_m)
+    # available is 7.509662, set required to 7.510 with tolerance 0.005
+    review_res = _geometry.inspect(geometry_path, entity_a, entity_b, axis_index, required_m=7.510, tolerance_m=0.005)
+    assert review_res["status"] == ClearanceStatus.REVIEW
+    assert abs(review_res["difference_m"]) <= 0.005
+
+
+def test_verifier_registry_exposure():
+    from robot_preflight.core import Preflight
+    assert Preflight.registry.is_supported("aisle_clearance")
+    assert "aisle_clearance" in Preflight.registry.registered_types()

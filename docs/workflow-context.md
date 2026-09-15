@@ -1,90 +1,101 @@
-# Workflow context
+# AMR Deployment Workflow Context
 
-Why this repository exists, in more detail than the README's short version.
+This document defines how `robot-preflight` sits within the real autonomous
+mobile robot (AMR) deployment lifecycle, where its technical boundaries lie today,
+and what remains downstream.
 
-## AMR deployment is a staged process, not one system
+## The 12-Stage AMR Deployment Lifecycle
 
-Deploying an autonomous mobile robot (AMR) into a real facility moves
-through a sequence of stages, roughly:
+Deploying an autonomous mobile robot fleet into an active warehouse or
+manufacturing facility is an iterative, multi-stage engineering process:
 
-1. mission and throughput requirements
-2. facility representation (CAD, scans, layouts)
-3. robot, attachment, and payload definition
-4. feasibility study and simulation
-5. detailed deployment design
-6. site preparation
-7. OEM fleet-manager and map configuration
-8. controls / PLC / WMS / MES integration
-9. commissioning
-10. workflow validation and stabilization
-11. production operations
-12. continuous improvement
+1. **Mission Definition** — operational objectives, material throughput, pick/drop endpoints.
+2. **Facility Representation** — architectural drawings, CAD models, 2D floor plans, lidar scans.
+3. **Robot & Envelope Definition** — base vehicle, attachments, payload dimensions, operating limits.
+4. **Feasibility Study & Simulation** — physics/traffic simulation (Isaac Sim, Gazebo, Webots), cycle times.
+5. **Detailed Deployment Design** — network infrastructure, safety zones, charger placements, route networks.
+6. **Site Preparation** — physical marking, barcode/reflector installation, Wi-Fi validation.
+7. **OEM Fleet Configuration** — mapping, zone declarations, dispatch rules (e.g. OTTO Fleet Manager, MiR Fleet).
+8. **Systems Integration** — PLC, WCS, WMS, MES, and elevator/door integration.
+9. **Commissioning** — physical floor trials, sensor validation, localization tuning.
+10. **Workflow Validation & Stabilization** — throughput soak testing, bottleneck analysis, exception handling.
+11. **Production Operations** — live fleet dispatch, continuous material movement.
+12. **Continuous Improvement** — layout changes, route optimization, fleet expansion.
 
-No single publicly established system of record spans all of this. Each
-stage tends to use its own representation of "the same" deployment, owned
-by different tools and often different vendors or teams. Simulation can
-force a redesign. Commissioning tests the digital assumptions against the
-physical site and frequently finds they disagree. Stabilization then
-changes maps, zones, or workflows based on what actually happened on the
-floor. Deployment is iterative by nature, not a single hand-off.
+---
 
-## Six truths about the same deployment
+## Where Robot Preflight Fits
 
-At any given time, a deployment is described by several distinct
-representations, which are not automatically kept consistent with each
-other:
+```
+Stage 1: Mission Definition
+Stage 2: Facility Representation
+Stage 3: Robot & Envelope Definition
+                 │
+                 ▼
+      [ ROBOT PREFLIGHT ]
+      • Sourced requirement extraction
+      • Spatial entity grounding
+      • Deterministic geometry checks
+      • PASS / BLOCKED / REVIEW decision
+                 │
+                 ▼
+Stage 4: Feasibility & Simulation
+                 │
+                 ▼
+Stage 5+: Detailed Design, OEM Configuration, Commissioning
+```
 
-| Truth | Typical representation |
-|---|---|
-| What the operation needs | workflows, endpoints, throughput |
-| What the facility contains | CAD, maps, scans, layouts |
-| What the robot can do | robot, attachment, payload, constraints |
-| What simulation predicts | routes, fleet size, traffic, throughput |
-| What the fleet system is configured to do | zones, endpoints, workflows, rules |
-| What actually happens | travel, docking, faults, interventions |
+Robot Preflight conceptually sits **between Stages 1–3 and Stage 4**.
 
-The recurring technical problem is reconciliation: keeping these
-representations consistent as the project moves forward, and catching it
-explicitly when they disagree rather than assuming they agree.
+Its role is to turn documented robot requirements and facility geometry into
+grounded, deterministic constraints *before* committing engineering time to
+physics simulation, detailed network design, or on-site commissioning.
 
-Some of the highest-value handoffs in this chain are exactly where
-disagreement tends to hide:
+### What Robot Preflight Does Not Replace
 
-- customer requirement → engineering mission
-- facility drawing or scan → deployment layout
-- robot documentation → engineering constraints
-- simulation → detailed configuration
-- detailed design → fleet manager
-- fleet configuration → robot / controls
-- commissioning observation → revised configuration
-- production telemetry → engineering improvement
+Robot Preflight does **not** replace:
+* **Physics & Traffic Simulation**: It does not simulate dynamics, wheel slip, battery drain, or traffic contention.
+* **OEM Fleet Managers**: It does not dispatch vehicles, program fleet routes, or edit OEM operational maps.
+* **Navigation Stacks (Nav2 / Open-RMF)**: It does not generate global costmaps or trajectory plans.
+* **Safety Certification**: It does not certify compliance with ISO 3691-4 or ANSI/RIA R15.08.
 
-## Where Robot Preflight fits
+Its job is to make physical assumptions explicit and catch spatial conflicts early.
 
-Robot Preflight currently operates between exactly two of these truths:
+---
 
-**what the facility contains** and **what the robot can do**.
+## The Six Truths of AMR Deployment
 
-It takes a robot's documented physical requirement (from a manufacturer
-specification) and a facility's geometry (from CAD/scan-derived data), and
-produces one deterministic, inspectable answer to a narrow question: does
-this specific requirement agree with this specific geometry?
+In an industrial facility, the same deployment is represented across six distinct
+sources of truth:
 
-It does not today ingest mission/throughput requirements, run simulation,
-configure a fleet manager, integrate with PLC/WMS/MES, or observe
-commissioning. It does not replace the tools that already exist for those
-stages. It sits earlier, and a verified constraint produced here could
-later become an input to simulation, configuration, or commissioning
-preparation — but that hand-off does not exist yet. See
-[`limitations.md`](limitations.md) for the exact current/roadmap boundary.
+| Truth | Common Representation | Typical Owner |
+|---|---|---|
+| **1. What the operation needs** | Workflows, throughput, endpoints | Industrial Engineering |
+| **2. What the facility contains** | CAD, glTF models, scans, layouts | Facilities / Real Estate |
+| **3. What the robot can do** | Spec sheets, payload envelopes, limits | Robot OEM |
+| **4. What simulation predicts** | Kinematics, cycle times, traffic | Automation Engineering |
+| **5. What the fleet is configured to do** | Zones, restrictions, endpoints | Field Applications |
+| **6. What actually happens on the floor** | Telemetry, faults, interventions | Operations |
 
-## What the current public evidence supports, and what remains unknown
+Today, **Robot Preflight focuses strictly on reconciling Truth 2 (the facility) and Truth 3 (the robot)**,
+using manually declared context from **Truth 1 (the mission)**.
 
-Supported by evidence in this repository: one facility-geometry-vs-robot-
-requirement reconciliation, computed twice independently, for one robot and
-one constraint. See [`verification.md`](verification.md).
+Truths 4, 5, and 6 are downstream:
+* A verified constraint produced by Robot Preflight can inform simulation parameters (Truth 4).
+* A verified constraint can serve as an acceptance criterion for OEM zone configuration (Truth 5).
+* Robot Preflight does not monitor live telemetry (Truth 6).
 
-Not supported by anything in this repository: that this generalizes cleanly
-to other constraints, other robots, other facility data formats, or other
-stages of the deployment lifecycle above. That generalization is the
-larger technical direction, not a current claim.
+---
+
+## Current Public Boundary vs. Future Direction
+
+| Capability | Current State in Repository | Roadmap / Future Direction |
+|---|---|---|
+| **Constraint Verifiers** | Exactly one: Selected-span aisle clearance (**Verifier #1**) | Vertical clearance, door width, turning radius, floor slope |
+| **Grounding** | Explicit manual node specification in `config.yaml` | Automated route/zone grounding from semantic task definitions |
+| **Facility Input** | Standard uncompressed binary glTF 2.0 (`.glb`) | CAD (STEP/DWG), 2D maps, lidar point clouds |
+| **Robot Input** | Curated lookup citing hashed manufacturer PDFs | Automated cited specification extraction from PDF |
+| **Downstream Output** | Structured JSON with complete provenance trail | Direct export to Nav2 costmap restrictions, Isaac Sim configs |
+| **Decision Vocabulary** | PASS, BLOCKED, REVIEW arithmetic implemented & verified | Multi-constraint aggregate preflight scoring |
+
+See [`current-capabilities.md`](current-capabilities.md) for the complete capability matrix and code audit.

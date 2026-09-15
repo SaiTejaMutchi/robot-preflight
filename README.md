@@ -1,17 +1,25 @@
 # Robot Preflight
 
-Verify robot requirements against facility geometry before commissioning.
+Preflight robot deployments before simulation and commissioning.
+
+Robot Preflight turns robot requirements, facility evidence, and deployment
+context into grounded constraints that can be checked before downstream
+engineering begins.
+
+Today, one verifier is fully evidenced end to end:
+
+**OTTO 1500 selected-span aisle clearance (Verifier #1).**
 
 ![Robot Preflight Hero Loop](media/hero/robot_preflight_hero.webp)
 
-## Verified example
+## Verifier #1 — Aisle Clearance (Verified Reference Example)
 
 | Evidence | Value |
 |---|---|
 | Robot | OTTO 1500 |
 | Constraint | Minimum one-way aisle width |
 | Required | 1.915 m |
-| Measured | 7.509663 m |
+| Measured (Unity PlayMode) | 7.509663 m |
 | Margin | +5.594663 m |
 | Decision | **PASS** |
 | Requirement source | OTTO 1500 manufacturer spec sheet, doc `OTTO-DS001D-EN-APR2024`, p.1 |
@@ -25,79 +33,169 @@ warehouse environment — not a warehouse built to pass. The measurement is
 deterministic and was independently reproduced outside the main Unity
 execution path. The two computations agree to within 1 micrometer.
 
-[Run the example](#quickstart) · [Inspect the evidence](#dont-trust-the-screenshot-reproduce-it) · [See the architecture](#architecture)
+[Run the example](#quickstart) · [Inspect the evidence](#dont-trust-the-screenshot-reproduce-it) · [See the architecture](#architecture) · [Current Capabilities Audit](docs/current-capabilities.md)
 
-## Demo
+---
 
-<video src="media/demo/robot_preflight.mp4" controls muted playsinline poster="media/screenshots/02_final_result.png" width="720"></video>
+## Where Robot Preflight Fits in AMR Deployment
+
+Deploying an autonomous mobile robot (AMR) into an active facility spans
+multiple stages: mission definition, facility representation, robot definition,
+feasibility and simulation, detailed deployment design, site preparation, OEM
+fleet configuration, and commissioning.
+
+Robot Preflight conceptually sits **between initial definition (Stages 1–3) and
+downstream simulation/commissioning (Stages 4+)**:
+
+```
+Stage 1: Mission Definition
+Stage 2: Facility Representation
+Stage 3: Robot & Envelope Definition
+                 │
+                 ▼
+      [ ROBOT PREFLIGHT ]
+      • Sourced requirement extraction
+      • Spatial entity grounding (manual today)
+      • Deterministic verifiers (Verifier #1: aisle clearance)
+      • PASS / BLOCKED / REVIEW decision
+                 │
+                 ▼
+      Verified Constraints
+                 │
+                 ▼ (can feed / future handoff)
+Existing downstream tools: Simulation · OEM Fleet Manager · Planners · Commissioning
+```
+
+Robot Preflight does **not** replace physics simulation, fleet managers (e.g.
+OTTO Fleet Manager, MiR Fleet), navigation planners (Nav2), or physical
+commissioning. Its job is to catch physical and spatial conflicts *before*
+those downstream tools are configured.
+
+See [`docs/workflow-context.md`](docs/workflow-context.md) for the complete
+12-stage deployment lifecycle.
+
+---
+
+## The Core Value: Why This Exists
+
+A geometry library can calculate the distance between two 3D meshes.
+**Robot Preflight preserves why that distance matters:**
+
+* **Which robot requirement it came from** — with citations to hashed manufacturer PDFs.
+* **Which deployment configuration it applies to** — nominal model, attachments, and operating mode.
+* **Which facility entities were measured** — exact node IDs from the facility spatial model.
+* **How they were measured** — axis, bounding hulls, and declared tolerances.
+* **Explicit decision status** — whether the requirement clearly passes, blocks, or requires review.
+* **Inspectable audit trail** — deterministic reproduction independent of UI rendering.
+
+---
+
+## Realistic User Flow Today
+
+1. **Cite Robot Requirement**: Sourced from manufacturer documentation (e.g. `otto_1500` one-way aisle width).
+2. **Provide Facility Geometry**: A standard binary glTF 2.0 (`.glb`) facility model.
+3. **Declare Deployment Parameters**: Coordinate axis (`X`, `Y`, or `Z`) and measurement tolerance (`tolerance_m`).
+4. **Designate Boundary Entities**: *(Manual today)* The user designates the two facility entity nodes (`entity_a` and `entity_b`) that define the critical span. Automated route/zone grounding is roadmap.
+5. **Run Preflight**: Run via the CLI (`robot-preflight check <dir>`) or Python SDK (`Preflight.check(...)`).
+6. **Evaluate Decision**: System returns `PASS`, `BLOCKED`, or `REVIEW` with an exact signed clearance margin.
+7. **Export Evidence Artifact**: Emits a structured JSON result suitable for CI gating or engineering review.
+
+---
+
+## Deployment Constraint Model
+
+Each preflight check is defined by a structured deployment contract. Below is the
+actual schema used for the verified reference example (`examples/otto1500_warehouse/config.yaml`):
+
+```yaml
+robot:
+  id: otto_1500
+
+facility:
+  geometry: Assets/StreamingAssets/WarehouseGeometry/aws_independent_warehouse.glb
+  source: >-
+    AWS RoboMaker Small Warehouse World (aws-robotics/aws-robomaker-small-warehouse-world,
+    frozen revision 3c23a698bf0b4e366ddf8b084af507c519bd3483, MIT-0)
+
+constraint:
+  type: aisle_clearance
+  required_m: 1.915
+  tolerance_m: 0.005
+
+measurement:
+  axis: X
+  entity_a: aws_robomaker_warehouse_ShelfF_01_001
+  entity_b: aws_robomaker_warehouse_ShelfD_01_001
+  method: >-
+    Nearest-face world-space gap between the two named entities' combined
+    renderer bounds along the X axis, clamped at 0.
+```
+
+> [!NOTE]
+> **Manual Grounding Boundary**: Today, the user explicitly designates `entity_a` and `entity_b`.
+> Automatic grounding from route waypoints or semantic zone definitions to facility
+> geometry is roadmap.
+
+---
+
+## Decision Vocabulary
+
+Robot Preflight implements a three-state deterministic decision model:
+
+* **`PASS`** — The measured clearance clearly satisfies the requirement with positive margin: `available - required > tolerance`.
+* **`BLOCKED`** — The measured clearance clearly violates the requirement: `available - required < -tolerance` (or `difference < 0`).
+* **`REVIEW`** — The measurement difference falls within the declared uncertainty tolerance (`|available - required| <= tolerance`), or geometry evidence is ambiguous, preventing a deterministic automated decision.
+
+Both Python and C# engines implement identical decision arithmetic, verified in unit tests.
+
+---
+
+## Architecture
+
+![Robot Preflight Architecture](media/architecture/robot_preflight_architecture.svg)
+
+Robot Preflight sits between robot requirements and facility geometry.
+Physical measurements come from explicit geometry. Compatibility decisions remain
+deterministic and inspectable:
+
+* **Verifier Registry** (`robot_preflight.verifiers`): An extensible registry mapping constraint types to dedicated verification implementations.
+* **Verifier #1** (`AisleClearanceVerifier`): The initial active verifier, executing nearest-face world-space bounds queries on glTF node trees.
+* **Dual Execution**: The same glTF bounds computation exists in Unity (`AisleClearanceChecker.cs`) and in pure Python (`validate_independent_warehouse_glb.py`), allowing independent cross-validation.
+
+Deeper detail: [`docs/architecture.md`](docs/architecture.md).
+
+---
+
+## Demo Video
+
+<video src="media/demo/robot_preflight.mp4" controls muted playsinline poster="media/hero/robot_preflight_hero_poster.png" width="720"></video>
 
 If the player above doesn't render: [`media/demo/robot_preflight.mp4`](media/demo/robot_preflight.mp4) (21 s, 2.2 MB, understandable muted).
 
-This is supporting evidence, not the proof — the reproducible computation
-below is the actual artifact.
+This video is supporting evidence, not the proof — the reproducible computation
+below is the actual verification artifact.
 
-## Why this exists
-
-AMR deployment moves through facility layouts, robot specifications,
-simulation models, OEM configuration, controls, commissioning, and finally
-the physical floor. Each stage represents the same deployment differently.
-
-Robot Preflight starts with one narrow question:
-
-**Does this robot requirement agree with the physical geometry of this site?**
-
-
-AMR deployment does not happen inside one system. The same deployment gets
-represented as mission and throughput requirements, a facility layout or
-map, a robot/attachment/payload definition, simulation assumptions, fleet
-configuration, integration logic, commissioning evidence, and eventual
-runtime behavior — usually in different tools, owned by different teams,
-at different times. The technical problem is keeping those representations
-consistent, and catching it explicitly when they disagree.
-
-| Truth | Typical representation |
-|---|---|
-| What the operation needs | workflows, endpoints, throughput |
-| What the facility contains | CAD, maps, scans, layouts |
-| What the robot can do | robot, attachment, payload, constraints |
-| What simulation predicts | routes, fleet size, traffic, throughput |
-| What the fleet system is configured to do | zones, endpoints, workflows, rules |
-| What actually happens | travel, docking, faults, interventions |
-
-Robot Preflight currently operates between two of these:
-
-**what the facility contains** and **what the robot can do**.
-
-The first public primitive is a deterministic compatibility check between
-them. The larger technical direction is to make more of these deployment
-truths explicit, verifiable, and machine-readable — that direction is not
-built yet. Full framing: [`docs/workflow-context.md`](docs/workflow-context.md).
-
-## Install
-
-```bash
-git clone <this repository>
-cd robot-preflight
-pip install -e .
-```
-
-Pure-Python, stdlib + [PyYAML](https://pyyaml.org/) — no Unity, no GPU, no
-license required to run the check itself.
+---
 
 ## Quickstart
 
+### Install
+
 ```bash
-python -m robot_preflight check examples/otto1500_warehouse
+pip install -e .
 ```
 
-This runs a fresh, independent Python recomputation, so it reports
-**7.509662 m** — not the frozen Unity measurement of **7.509663 m** shown
-in the table above. Both are genuine; they are two separate computations
-of the same geometry, documented to agree within 1 µm (see
-[Reproduce it](#dont-trust-the-screenshot-reproduce-it)), not a
-discrepancy to resolve.
+Requires Python 3.9+ and `PyYAML>=6.0`. No heavy ML frameworks or external graphics runtimes required for CLI verification.
 
+### Run the CLI
+
+```bash
+robot-preflight check examples/otto1500_warehouse
 ```
+
+Expected output:
+
+```text
 Robot Preflight
 
 Robot        otto_1500
@@ -110,18 +208,27 @@ Margin       +5.594662 m
 Decision     PASS
 
 Requirement source
-OTTO 1500 Spec Sheet, doc OTTO-DS001D-EN-APR2024, p.1: ...
+OTTO 1500 Spec Sheet, doc OTTO-DS001D-EN-APR2024, p.1: 'Min. Aisle Width 1915 mm (78 in) (One Way)'. See evidence/requirements/otto/OTTO_EVIDENCE_RECORD.md.
 
 Facility source
-AWS RoboMaker Small Warehouse World ...
+AWS RoboMaker Small Warehouse World (aws-robotics/aws-robomaker-small-warehouse-world, frozen revision 3c23a698bf0b4e366ddf8b084af507c519bd3483, MIT-0)
 
 Verification
-Deterministic geometry: nearest-face world-space gap between the two named
-entities' renderer bounds along the configured axis, computed by
-re-parsing the facility .glb ... not a stored value.
+Deterministic geometry: nearest-face world-space gap between the two named entities' renderer bounds along the configured axis, computed by re-parsing the facility .glb (Tools/WarehouseGeometry/validate_independent_warehouse_glb.py:inspect, invoked directly by this module -- not a stored value).
 ```
 
-Or from Python:
+### JSON Output for CI/CD
+
+```bash
+robot-preflight check examples/otto1500_warehouse --json
+```
+
+Exit codes:
+* `0`: PASS
+* `1`: BLOCKED or REVIEW (fails CI gate)
+* `2`: Execution error (missing entity, invalid YAML, corrupt GLB)
+
+### Python SDK
 
 ```python
 from robot_preflight import Preflight
@@ -131,313 +238,60 @@ result = Preflight.check(
     facility="examples/otto1500_warehouse",
     constraint="aisle_clearance",
 )
-print(result)
+
+assert result.decision == "PASS"
+print(f"Margin: {result.margin_m:+.6f} m")
 ```
 
-Both call the same real logic — they re-parse
-[`examples/otto1500_warehouse/config.yaml`](examples/otto1500_warehouse/config.yaml)
-and the facility `.glb` it points at, then recompute the measurement from
-raw geometry. Neither reads a stored expected-output file back to you.
-
-## Output contract
-
-`available_m` below is the independent Python recomputation (7.509662 m),
-not the frozen Unity measurement (7.509663 m) — see the note above.
-
-```json
-{
-  "decision": "PASS",
-  "robot": "otto_1500",
-  "constraint": "aisle_clearance",
-  "required_m": 1.915,
-  "available_m": 7.509662,
-  "margin_m": 5.594662,
-  "requirement_source": "OTTO 1500 Spec Sheet, doc OTTO-DS001D-EN-APR2024, p.1 ...",
-  "facility_source": "AWS RoboMaker Small Warehouse World ...",
-  "facility_entities": [
-    "aws_robomaker_warehouse_ShelfF_01_001",
-    "aws_robomaker_warehouse_ShelfD_01_001"
-  ],
-  "verification_method": "Deterministic geometry ...",
-  "evidence": {
-    "geometry_file": "Assets/StreamingAssets/WarehouseGeometry/aws_independent_warehouse.glb",
-    "geometry_file_bytes": 619192,
-    "geometry_file_nodes": 30,
-    "geometry_file_triangles": 8345,
-    "axis": "X",
-    "tolerance_m": 0.005,
-    "facility_config": "examples/otto1500_warehouse/config.yaml"
-  }
-}
-```
-
-Get it with `python -m robot_preflight check examples/otto1500_warehouse --json`
-or `result.to_dict()`. Every field is either a **source** citation, a
-**measured** value from this run, or a **derived** value (margin = measured
-− required); none of it is invented for display.
-
-## What this proves
-
-The selected warehouse span is wider than the published OTTO 1500 minimum
-one-way aisle-width requirement.
-
-## What this does not prove
-
-This result does not establish:
-
-- whole-facility readiness
-- turning clearance
-- docking compatibility
-- doorway clearance
-- route feasibility
-- throughput
-- safety certification
-- deployment approval
-
-It is one verified compatibility decision, for one robot, in one facility.
+---
 
 ## Don't trust the screenshot. Reproduce it.
 
-```bash
-make verify
-```
-
-runs the real computation and checks it against the frozen record —
-including source-file hashes, not just the final numbers:
-
-```
-Robot Preflight reference verification
-
-OTTO source PDF hash         verified
-Facility GLB hash            verified
-Deterministic measurement (recomputed) verified
-Required matches frozen record verified
-Measured matches frozen record verified
-Decision matches frozen record verified
-
-Required                    1.915000 m
-Measured (this run, Python)  7.509662 m
-Measured (frozen, Unity)     7.509663 m
-Margin (this run)            +5.594662 m
-
-Decision                    PASS
-
-Reference reproduction      VERIFIED (6 passed, 0 failed)
-```
-
-Or inspect each link in the chain directly:
-
-### Frozen result
-
-[`evidence/results/otto1500_warehouse.json`](evidence/results/otto1500_warehouse.json)
-
-Machine-readable result record: measurement, decision, source hashes,
-environment git revision, test class/method, and the Unity-vs-Python
-cross-validation. Also documents one internal correction, transparently:
-the facility `.glb`'s hash on file went stale after a later, legitimate
-scene expansion — see that file's `superseding_file_state` field.
-
-### Manufacturer requirement
-
-[`evidence/requirements/otto/OTTO_1500_Spec_Sheet_OTTO-DS001D-EN-APR2024.pdf`](evidence/requirements/otto/OTTO_1500_Spec_Sheet_OTTO-DS001D-EN-APR2024.pdf)
-
-Original manufacturer source for the aisle-width requirement, with a
-rendered page-1 crop and SHA-256 recorded in
-[`OTTO_EVIDENCE_RECORD.md`](evidence/requirements/otto/OTTO_EVIDENCE_RECORD.md).
-
-### Measurement preregistration
-
-[`evidence/environments/warehouse_measurement_preregistration.md`](evidence/environments/warehouse_measurement_preregistration.md)
-
-Defines the selected geometry and measurement method *before* the accepted
-run — so the entities weren't picked after seeing a favorable number.
-
-### Geometry validation
-
-[`docs/geometry-validation.md`](docs/geometry-validation.md)
-
-Geometry checks, known risks, validation decisions, failure conditions, and
-explicit GO/NO-GO criteria — including the honest NO-GO on the original
-public dataset that was tried and abandoned before this one was used.
-
-### Architecture
-
-[`docs/architecture.md`](docs/architecture.md)
-
-## Provenance chain
-
-```
-OTTO manufacturer specification
-        ↓
-1.915 m minimum one-way aisle width
-        ↓
-selected AWS warehouse geometry (independently sourced, frozen revision)
-        ↓
-aws_robomaker_warehouse_ShelfF_01_001  ↔  aws_robomaker_warehouse_ShelfD_01_001
-        ↓
-deterministic nearest-face span measurement
-        ↓
-7.509663 m (Unity)  /  7.509662 m (independent Python, agrees within 1 µm)
-        ↓
-measured − required
-        ↓
-+5.594663 m
-        ↓
-PASS
-```
-
-## Architecture
-
-![Robot Preflight Architecture](media/architecture/robot_preflight_architecture.svg)
-
-
-AI can help interpret a requirement and deployment context. Physical
-measurements come from explicit geometry. Compatibility decisions remain
-deterministic and inspectable — the same glTF bounds computation runs
-whether it's invoked from Unity (`AisleClearanceChecker.cs`) or from this
-Python SDK (`robot_preflight/core.py`, which calls the same
-`validate_independent_warehouse_glb.py` used for cross-validation).
-
-**PASS** — evidence clearly satisfies the declared constraint.
-**BLOCKED** — evidence clearly violates the declared constraint.
-**REVIEW** — evidence is insufficient, ambiguous, or too close to the
-tolerance for a deterministic decision either way.
-
-Deeper detail: [`docs/architecture.md`](docs/architecture.md).
-
-## Where this fits in deployment
-
-Tools already exist for facility design, simulation, OEM fleet
-configuration, controls, and commissioning. Robot Preflight does not
-replace them. It sits earlier, and asks a narrower question:
-
-**Are the declared robot constraints consistent with the facility evidence
-we have right now?**
-
-A verified constraint produced here could later become an input to
-simulation, configuration, or commissioning preparation — but that
-hand-off does not exist today. See
-[`docs/workflow-context.md`](docs/workflow-context.md) for the full
-deployment-lifecycle picture this fits into.
-
-## SDK
-
-```python
-from robot_preflight import Preflight, PreflightResult
-
-result: PreflightResult = Preflight.check(
-    robot="otto_1500",
-    facility="examples/otto1500_warehouse",
-    constraint="aisle_clearance",
-)
-result.decision      # "PASS"
-result.available_m   # 7.509662
-result.to_dict()      # the JSON contract above
-```
-
-Source: [`robot_preflight/core.py`](robot_preflight/core.py). It
-dynamically imports and calls
-[`Tools/WarehouseGeometry/validate_independent_warehouse_glb.py`](Tools/WarehouseGeometry/validate_independent_warehouse_glb.py)'s
-`inspect()` function directly — the same script used for the frozen
-cross-validation — rather than reimplementing the geometry math a second
-time.
-
-## CLI
+Every claim in this repository is reproducible from source:
 
 ```bash
-python -m robot_preflight check examples/otto1500_warehouse
-python -m robot_preflight check examples/otto1500_warehouse --json
+make test    # Runs full unit test suite (8 tests)
+make verify  # Verifies hashes, determinism, and 1 µm numeric agreement
 ```
 
-Exits `0` on PASS, `1` on BLOCKED/REVIEW or a config error — usable as a CI
-gate, not just a demo.
+### Verification Artifacts on Disk
 
-## Verification
+1. **Frozen Result**: [`evidence/results/otto1500_warehouse.json`](evidence/results/otto1500_warehouse.json) — Full run record with hashes.
+2. **Manufacturer Spec Sheet**: [`evidence/requirements/otto/`](evidence/requirements/otto/) — Hashed manufacturer PDF and page-1 crop.
+3. **Preregistration Record**: [`evidence/environments/warehouse_measurement_preregistration.md`](evidence/environments/warehouse_measurement_preregistration.md) — Pre-run entity selection record.
+4. **Current Capabilities Audit**: [`docs/current-capabilities.md`](docs/current-capabilities.md) — Comprehensive capability matrix.
 
-```bash
-make verify
-```
+---
 
-See [Reproduce it](#dont-trust-the-screenshot-reproduce-it) above for what
-it checks and its output, and [`docs/verification.md`](docs/verification.md)
-for the full explanation.
+## What This Proves and What It Does Not
 
-## Tests
+### Proven by Evidence Today
+* One robot requirement and one independent facility geometry reconciled end-to-end.
+* Independent cross-validation between Unity 6 and pure Python agreeing within 1 µm.
+* Extensible verifier architecture with Verifier #1 operational.
 
-```bash
-make test
-```
+### Not Supported Today (Roadmap)
+* Automated CAD/IFC or 2D floorplan ingestion (GLB only today).
+* Automated entity grounding (requires explicit node names today).
+* Route, waypoint, or operational mission context.
+* Automated generation of Nav2 costmaps or OEM fleet configurations.
+* Whole-facility safety certification (ISO 3691-4 / ANSI R15.08).
 
-Six tests against the public API (not internals): the reference result
-reproduces, it matches the frozen record within the documented tolerance,
-an unresolvable entity name raises instead of returning a result, a
-facility config whose `required_m` disagrees with the sourced requirement
-is rejected rather than silently overridden, an unknown robot/constraint
-pair raises, and — structurally — that `robot_preflight/core.py` never
-reads the frozen result file in its actual code path. Source:
-[`tests/test_robot_preflight.py`](tests/test_robot_preflight.py).
+See [`docs/limitations.md`](docs/limitations.md) and [`docs/current-capabilities.md`](docs/current-capabilities.md).
 
-## Current scope
+---
 
-**Verified:** the selected-span aisle-clearance check above, for OTTO 1500
-against the frozen OTTO/AWS example, reproduced independently of Unity.
+## Documentation
 
-**Implemented, not independently re-verified:** the general
-robot/constraint/facility config format (`examples/otto1500_warehouse/config.yaml`)
-generalizes beyond this one example, but no second example has been built
-and evidenced the same way.
+* [`docs/current-capabilities.md`](docs/current-capabilities.md) — Capability matrix and code audit.
+* [`docs/workflow-context.md`](docs/workflow-context.md) — Where Robot Preflight sits in the 12-stage AMR lifecycle.
+* [`docs/architecture.md`](docs/architecture.md) — Internal architecture and Unity implementation details.
+* [`docs/verification.md`](docs/verification.md) — Independent cross-validation methodology.
+* [`docs/geometry-validation.md`](docs/geometry-validation.md) — Geometry pipeline analysis and GO/NO-GO criteria.
+* [`docs/unity-development.md`](docs/unity-development.md) — Unity development and batchmode test reproduction.
 
-**Known limitation, explicitly tracked, not silently resolved:** a later
-OTTO 1500 manufacturer document (`OTTO-DS001F-EN-AUG2026`) states a
-different one-way aisle-width value — 2.209 m, with an explicit "no
-payload" qualifier the APR2024 document's text did not carry — for the same
-nominal constraint. The frozen PASS result above has **not** been re-run or
-re-verified against that revision; the SDK's requirement lookup still cites
-APR2024 on purpose. Full analysis:
-[`evidence/requirements/otto/OTTO_EVIDENCE_RECORD_AUG2026.md`](evidence/requirements/otto/OTTO_EVIDENCE_RECORD_AUG2026.md).
-More in [`docs/limitations.md`](docs/limitations.md).
-
-## Roadmap
-
-Planned only — none of the items below exist yet:
-
-1. Additional physical deployment constraints (turning clearance, docking, doorway clearance)
-2. Multiple robot configurations, including re-verifying against the AUG2026 OTTO document
-3. Planner-ready verified constraints
-4. Requalification when robot, site, task, or payload changes
-
-## Workflow context
-
-[`docs/workflow-context.md`](docs/workflow-context.md) — the staged AMR
-deployment lifecycle, the six truths, the highest-value handoffs, and where
-this repository's current evidence stops.
-
-## Unity development environment
-
-Unity is a runtime and visualization environment for this geometry check,
-not the project's conceptual identity — the check itself is Unity-agnostic
-Python above. See [`docs/unity-development.md`](docs/unity-development.md)
-for setup, batchmode notes, and how to reproduce the original Play Mode
-run.
-
-## Deeper docs
-
-- [`docs/architecture.md`](docs/architecture.md)
-- [`docs/verification.md`](docs/verification.md)
-- [`docs/geometry-validation.md`](docs/geometry-validation.md)
-- [`docs/workflow-context.md`](docs/workflow-context.md)
-- [`docs/limitations.md`](docs/limitations.md)
-- [`docs/unity-development.md`](docs/unity-development.md)
-- [`docs/ARCHITECTURE.md`](docs/ARCHITECTURE.md) — full audit of the legacy Unity system this checker lives inside
-- [`docs/FUNCTIONALITY_AUDIT.md`](docs/FUNCTIONALITY_AUDIT.md)
-
-## Built by
-
-Robot Preflight is currently built by Sai Teja Mutchi.
-
-Background: 3D geometry and spatial measurement at Dassault Systèmes;
-multimodal grounding at Columbia; production AI systems at Everest.
+---
 
 ## License
 
-Licensed under the Apache License 2.0. See [`LICENSE`](LICENSE).
+Licensed under the [Apache License, Version 2.0](LICENSE).
